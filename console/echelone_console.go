@@ -44,6 +44,11 @@ func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 	const eraseLine = "\u001B[K" // move to the beginning and erase
 	const savePosition = "\u001B[s"
 	const restorePosition = "\u001B[u"
+	commonElements := commonElementsCount(linesBefore, linesAfter)
+	if commonElements > 0 {
+		calculateIncrementalUpdate(output, linesBefore[commonElements:], linesAfter[commonElements:])
+		return
+	}
 	linesBeforeCount := len(linesBefore)
 	linesAfterCount := len(linesAfter)
 	if linesBeforeCount > linesAfterCount {
@@ -72,4 +77,19 @@ func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 	}
 	output.WriteString(restorePosition)
 	output.Flush()
+}
+
+func commonElementsCount(one []string, two []string) int {
+	oneCount := len(one)
+	twoCount := len(two)
+	minCount := oneCount
+	if twoCount < minCount {
+		minCount = twoCount
+	}
+	for i := 0; i < minCount; i++ {
+		if one[i] != two[i] {
+			return i
+		}
+	}
+	return minCount
 }
