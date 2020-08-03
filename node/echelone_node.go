@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"math"
+	"strings"
 	"sync"
 	"time"
 )
@@ -63,10 +64,35 @@ func (node *EchelonNode) SetDescription(description []string) {
 	node.description = description
 }
 
-func (node *EchelonNode) AppendDescription(text string) {
+func (node *EchelonNode) AppendDescription(line string) {
+	node.AppendDescriptionLines([]string{line})
+}
+
+func (node *EchelonNode) AppendDescriptionLines(lines []string) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
-	node.description = append(node.description, text)
+	node.description = append(node.description, lines...)
+	linesTotal := len(node.description)
+	if linesTotal > node.maxDescriptionLines {
+		node.description = node.description[(linesTotal - node.maxDescriptionLines):]
+	}
+}
+
+func (node *EchelonNode) AppendDescriptionBytes(bytes []byte) {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	linesToAppend := strings.Split(string(bytes), "\n")
+	if len(linesToAppend) == 0 {
+		return
+	}
+	if len(node.description) == 0 {
+		node.description = linesToAppend
+		return
+	}
+	node.description[len(node.description)-1] = node.description[len(node.description)-1] + linesToAppend[0]
+	if len(linesToAppend) > 1 {
+		node.description = append(node.description, linesToAppend[1:]...)
+	}
 	linesTotal := len(node.description)
 	if linesTotal > node.maxDescriptionLines {
 		node.description = node.description[(linesTotal - node.maxDescriptionLines):]
@@ -77,18 +103,24 @@ func (node *EchelonNode) Render() []string {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
 	result := []string{node.fancyTitle()}
+	tail := node.description
 	if len(node.children) > 0 {
-		for _, child := range node.children {
-			for _, childDescriptionLine := range child.Render() {
-				result = append(result, "  "+childDescriptionLine)
-			}
-		}
-	} else {
-		for _, descriptionLine := range node.description {
-			result = append(result, "  "+descriptionLine)
-		}
+		tail = node.RenderChildren()
+	}
+	for _, descriptionLine := range tail {
+		result = append(result, "  "+descriptionLine)
 	}
 
+	return result
+}
+
+func (node *EchelonNode) RenderChildren() []string {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	var result []string
+	for _, child := range node.children {
+		result = append(result, child.Render()...)
+	}
 	return result
 }
 
