@@ -234,10 +234,12 @@ func (node *EchelonNode) Complete() {
 }
 func (node *EchelonNode) CompleteWithColor(ansiColor int) {
 	node.lock.Lock()
-	node.endTime = time.Now()
+	defer node.lock.Unlock()
 	node.titleColor = ansiColor
-	node.lock.Unlock()
-	node.done.Done()
+	if node.endTime.IsZero() {
+		node.endTime = time.Now()
+		node.done.Done()
+	}
 }
 
 func (node *EchelonNode) WaitCompletion() {
