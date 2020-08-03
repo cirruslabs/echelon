@@ -41,13 +41,14 @@ func StartNewEchelonNode(title string) *EchelonNode {
 }
 
 func NewEchelonNode(title string) *EchelonNode {
+	zeroTime := time.Time{}
 	result := &EchelonNode{
 		title:               title,
 		titleColor:          -1,
 		description:         make([]string, 0),
 		maxDescriptionLines: 5,
-		startTime:           time.Unix(0, 0),
-		endTime:             time.Unix(0, 0),
+		startTime:           zeroTime,
+		endTime:             zeroTime,
 		children:            make([]*EchelonNode, 0),
 	}
 	result.done.Add(1)
@@ -175,10 +176,22 @@ func (node *EchelonNode) ExecutionDuration() time.Duration {
 	}
 }
 
+func (node *EchelonNode) HasStarted() bool {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	return !node.startTime.IsZero()
+}
+
+func (node *EchelonNode) HasCompleted() bool {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	return !node.startTime.IsZero() && !node.endTime.IsZero()
+}
+
 func (node *EchelonNode) IsRunning() bool {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	return node.endTime.Before(node.startTime)
+	return !node.startTime.IsZero() && node.endTime.IsZero()
 }
 
 func (node *EchelonNode) StartNewChild(childName string) *EchelonNode {
@@ -208,6 +221,14 @@ func (node *EchelonNode) AddNewChild(child *EchelonNode) {
 	node.children = append(node.children, child)
 }
 
+func (node *EchelonNode) Start() {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	if node.startTime.IsZero() {
+		node.startTime = time.Now()
+	}
+}
+
 func (node *EchelonNode) Complete() {
 	node.CompleteWithColor(-1)
 }
@@ -219,13 +240,7 @@ func (node *EchelonNode) CompleteWithColor(ansiColor int) {
 	node.done.Done()
 }
 
-func (node *EchelonNode) Start() {
-	node.lock.Lock()
-	defer node.lock.Unlock()
-	node.startTime = time.Now()
-}
-
-func (node *EchelonNode) Wait() {
+func (node *EchelonNode) WaitCompletion() {
 	node.done.Wait()
 }
 

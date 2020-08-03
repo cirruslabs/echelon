@@ -24,7 +24,7 @@ func generateNode(magicConstant int) *node.EchelonNode {
 			if rand.Intn(100) < magicConstant {
 				child := generateNode(magicConstant - 1)
 				result.AddNewChild(child)
-				child.Wait()
+				child.WaitCompletion()
 			} else {
 				childJobId := atomic.AddUint64(&jobIdCounter, 1)
 				child := node.StartNewEchelonNode(fmt.Sprintf("Job %d", childJobId))
