@@ -35,12 +35,18 @@ type EchelonNode struct {
 }
 
 func StartNewEchelonNode(title string) *EchelonNode {
+	result := NewEchelonNode(title)
+	result.Start()
+	return result
+}
+
+func NewEchelonNode(title string) *EchelonNode {
 	result := &EchelonNode{
 		title:               title,
 		titleColor:          -1,
 		description:         make([]string, 0),
 		maxDescriptionLines: 5,
-		startTime:           time.Now(),
+		startTime:           time.Unix(0, 0),
 		endTime:             time.Unix(0, 0),
 		children:            make([]*EchelonNode, 0),
 	}
@@ -196,6 +202,12 @@ func (node *EchelonNode) CompleteWithColor(ansiColor int) {
 	node.titleColor = ansiColor
 	node.lock.Unlock()
 	node.done.Done()
+}
+
+func (node *EchelonNode) Start() {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.startTime = time.Now()
 }
 
 func (node *EchelonNode) Wait() {
