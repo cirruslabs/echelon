@@ -73,13 +73,13 @@ func (node *EchelonNode) AppendDescription(text string) {
 	}
 }
 
-func (node *EchelonNode) Draw() []string {
+func (node *EchelonNode) Render() []string {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
 	result := []string{node.fancyTitle()}
 	if len(node.children) > 0 {
 		for _, child := range node.children {
-			for _, childDescriptionLine := range child.Draw() {
+			for _, childDescriptionLine := range child.Render() {
 				result = append(result, "  "+childDescriptionLine)
 			}
 		}
