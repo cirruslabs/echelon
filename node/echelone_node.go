@@ -169,6 +169,12 @@ func (node *EchelonNode) IsRunning() bool {
 	return node.endTime.Before(node.startTime)
 }
 
+func (node *EchelonNode) StartNewChild(childName string) *EchelonNode {
+	child := StartNewEchelonNode(childName)
+	node.AddNewChild(child)
+	return child
+}
+
 func (node *EchelonNode) AddNewChild(child *EchelonNode) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
