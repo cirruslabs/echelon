@@ -1,1 +1,3 @@
-# Echelon - hierarchical progress bars in terminal on steroids
+# Echelon - hierarchical progress in terminal on steroids
+
+WIP
