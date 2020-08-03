@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	console.NewConsole(os.Stdout, generateNode(15)).StartDrawing()
+	console.NewConsole(os.Stdout, generateNode(15), false).StartDrawing()
 }
 
 var jobIdCounter uint64

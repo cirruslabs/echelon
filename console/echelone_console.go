@@ -13,12 +13,14 @@ type EchelonConsole struct {
 	root              *node.EchelonNode
 	currentFrameLines []string
 	refreshRate       time.Duration
+	renderRoot        bool
 }
 
-func NewConsole(output *os.File, root *node.EchelonNode) *EchelonConsole {
+func NewConsole(output *os.File, root *node.EchelonNode, renderRoot bool) *EchelonConsole {
 	return &EchelonConsole{
 		output:      bufio.NewWriter(output),
 		root:        root,
+		renderRoot:  renderRoot,
 		refreshRate: 200 * time.Millisecond,
 	}
 }
@@ -32,7 +34,12 @@ func (console *EchelonConsole) StartDrawing() {
 }
 
 func (console *EchelonConsole) renderFrame() {
-	newFrameLines := console.root.Render()
+	var newFrameLines []string
+	if console.renderRoot {
+		newFrameLines = console.root.Render()
+	} else {
+		newFrameLines = console.root.RenderChildren()
+	}
 	calculateIncrementalUpdate(console.output, console.currentFrameLines, newFrameLines)
 	console.currentFrameLines = newFrameLines
 }
