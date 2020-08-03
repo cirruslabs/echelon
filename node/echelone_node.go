@@ -54,6 +54,12 @@ func (node *EchelonNode) UpdateTitle(text string) {
 	node.title = text
 }
 
+func (node *EchelonNode) ClearAllChildren() {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.children = make([]*EchelonNode, 0)
+}
+
 func (node *EchelonNode) ClearDescription() {
 	node.SetDescription(make([]string, 0))
 }
