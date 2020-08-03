@@ -29,11 +29,16 @@ func generateNode(magicConstant int) *node.EchelonNode {
 				childJobId := atomic.AddUint64(&jobIdCounter, 1)
 				child := node.StartNewEchelonNode(fmt.Sprintf("Job %d", childJobId))
 				result.AddNewChild(child)
-				time.Sleep(time.Duration(rand.Intn(magicConstant)) * time.Second)
-				child.Complete()
+				subJobDuration := rand.Intn(magicConstant)
+				for waitSecond := 0; waitSecond < subJobDuration; waitSecond++ {
+					time.Sleep(time.Second)
+					child.AppendDescription(fmt.Sprintf("Doing very important jobs! Completed %d/100...", 100*(waitSecond+1)/subJobDuration))
+				}
+				child.ClearDescription()
+				child.CompleteWithColor(node.GREEN_COLOR)
 			}
 		}
-		result.Complete()
+		result.CompleteWithColor(node.GREEN_COLOR)
 	}()
 	return result
 }

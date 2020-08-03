@@ -7,10 +7,25 @@ import (
 	"time"
 )
 
+// Reset ANSI sequence
+const resetSequence = "\033[0m"
+
+const (
+	BLACK_COLOR = iota
+	RED_COLOR
+	GREEN_COLOR
+	YELLOW_COLOR
+	BLUE_COLOR
+	MAGENTA_COLOR
+	CYAN_COLOR
+	WHITE_COLOR
+)
+
 type EchelonNode struct {
 	lock                sync.RWMutex
 	done                sync.WaitGroup
 	title               string
+	titleColor          int
 	description         []string
 	maxDescriptionLines int
 	startTime           time.Time
@@ -21,6 +36,7 @@ type EchelonNode struct {
 func StartNewEchelonNode(title string) *EchelonNode {
 	result := &EchelonNode{
 		title:               title,
+		titleColor:          -1,
 		description:         make([]string, 0),
 		maxDescriptionLines: 5,
 		startTime:           time.Now(),
@@ -37,6 +53,16 @@ func (node *EchelonNode) UpdateTitle(text string) {
 	node.title = text
 }
 
+func (node *EchelonNode) ClearDescription() {
+	node.SetDescription(make([]string, 0))
+}
+
+func (node *EchelonNode) SetDescription(description []string) {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.description = description
+}
+
 func (node *EchelonNode) AppendDescription(text string) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
@@ -50,9 +76,7 @@ func (node *EchelonNode) AppendDescription(text string) {
 func (node *EchelonNode) Draw() []string {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	result := []string{
-		fmt.Sprintf("%s %s", node.title, formatDuration(node.ExecutionDuration())),
-	}
+	result := []string{node.fancyTitle()}
 	if len(node.children) > 0 {
 		for _, child := range node.children {
 			for _, childDescriptionLine := range child.Draw() {
@@ -66,6 +90,17 @@ func (node *EchelonNode) Draw() []string {
 	}
 
 	return result
+}
+
+func (node *EchelonNode) fancyTitle() string {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	prefix := "[+]"
+	if node.IsRunning() {
+		prefix = "[-]"
+	}
+	coloredTitle := fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
+	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, formatDuration(node.ExecutionDuration()))
 }
 
 func formatDuration(duration time.Duration) string {
@@ -109,12 +144,23 @@ func (node *EchelonNode) AddNewChild(child *EchelonNode) {
 }
 
 func (node *EchelonNode) Complete() {
+	node.CompleteWithColor(-1)
+}
+func (node *EchelonNode) CompleteWithColor(ansiColor int) {
 	node.lock.Lock()
 	node.endTime = time.Now()
+	node.titleColor = ansiColor
 	node.lock.Unlock()
 	node.done.Done()
 }
 
 func (node *EchelonNode) Wait() {
 	node.done.Wait()
+}
+
+func getColorSequence(code int) string {
+	if code < 0 {
+		return resetSequence
+	}
+	return fmt.Sprintf("\033[3%dm", code)
 }
