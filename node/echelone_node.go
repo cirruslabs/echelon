@@ -187,6 +187,21 @@ func (node *EchelonNode) StartNewChild(childName string) *EchelonNode {
 	return child
 }
 
+func (node *EchelonNode) FindOrCreateChild(childTitle string) *EchelonNode {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	// look from the end since this is a common pattern to get the last child
+	for i := len(node.children) - 1; i >= 0; i-- {
+		child := node.children[i]
+		if child.title == childTitle {
+			return child
+		}
+	}
+	child := NewEchelonNode(childTitle)
+	node.children = append(node.children, child)
+	return child
+}
+
 func (node *EchelonNode) AddNewChild(child *EchelonNode) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
