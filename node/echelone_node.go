@@ -23,33 +23,37 @@ const (
 )
 
 type EchelonNode struct {
-	lock                sync.RWMutex
-	done                sync.WaitGroup
-	title               string
-	titleColor          int
-	description         []string
-	maxDescriptionLines int
-	startTime           time.Time
-	endTime             time.Time
-	children            []*EchelonNode
+	lock                    sync.RWMutex
+	done                    sync.WaitGroup
+	status                  string
+	title                   string
+	titleColor              int
+	description             []string
+	visibleDescriptionLines int
+	config                  *EchelonNodeRenderingConfig
+	startTime               time.Time
+	endTime                 time.Time
+	children                []*EchelonNode
 }
 
-func StartNewEchelonNode(title string) *EchelonNode {
-	result := NewEchelonNode(title)
+func StartNewEchelonNode(title string, config *EchelonNodeRenderingConfig) *EchelonNode {
+	result := NewEchelonNode(title, config)
 	result.Start()
 	return result
 }
 
-func NewEchelonNode(title string) *EchelonNode {
+func NewEchelonNode(title string, config *EchelonNodeRenderingConfig) *EchelonNode {
 	zeroTime := time.Time{}
 	result := &EchelonNode{
-		title:               title,
-		titleColor:          -1,
-		description:         make([]string, 0),
-		maxDescriptionLines: 5,
-		startTime:           zeroTime,
-		endTime:             zeroTime,
-		children:            make([]*EchelonNode, 0),
+		status:                  "",
+		title:                   title,
+		titleColor:              -1,
+		description:             make([]string, 0),
+		visibleDescriptionLines: 5,
+		config:                  config,
+		startTime:               zeroTime,
+		endTime:                 zeroTime,
+		children:                make([]*EchelonNode, 0),
 	}
 	result.done.Add(1)
 	return result
@@ -85,10 +89,6 @@ func (node *EchelonNode) AppendDescriptionLines(lines []string) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.description = append(node.description, lines...)
-	linesTotal := len(node.description)
-	if linesTotal > node.maxDescriptionLines {
-		node.description = node.description[(linesTotal - node.maxDescriptionLines):]
-	}
 }
 
 func (node *EchelonNode) AppendDescriptionBytes(bytes []byte) {
@@ -105,10 +105,6 @@ func (node *EchelonNode) AppendDescriptionBytes(bytes []byte) {
 	node.description[len(node.description)-1] = node.description[len(node.description)-1] + linesToAppend[0]
 	if len(linesToAppend) > 1 {
 		node.description = append(node.description, linesToAppend[1:]...)
-	}
-	linesTotal := len(node.description)
-	if linesTotal > node.maxDescriptionLines {
-		node.description = node.description[(linesTotal - node.maxDescriptionLines):]
 	}
 }
 
@@ -140,9 +136,9 @@ func (node *EchelonNode) RenderChildren() []string {
 func (node *EchelonNode) fancyTitle() string {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	prefix := "[+]"
+	prefix := node.status
 	if node.IsRunning() {
-		prefix = "[-]"
+		prefix = node.config.CurrentProgressIndicatorFrame()
 	}
 	coloredTitle := fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
 	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, formatDuration(node.ExecutionDuration()))
@@ -195,7 +191,7 @@ func (node *EchelonNode) IsRunning() bool {
 }
 
 func (node *EchelonNode) StartNewChild(childName string) *EchelonNode {
-	child := StartNewEchelonNode(childName)
+	child := StartNewEchelonNode(childName, node.config)
 	node.AddNewChild(child)
 	return child
 }
@@ -210,7 +206,7 @@ func (node *EchelonNode) FindOrCreateChild(childTitle string) *EchelonNode {
 			return child
 		}
 	}
-	child := NewEchelonNode(childTitle)
+	child := NewEchelonNode(childTitle, node.config)
 	node.children = append(node.children, child)
 	return child
 }
@@ -230,16 +226,25 @@ func (node *EchelonNode) Start() {
 }
 
 func (node *EchelonNode) Complete() {
-	node.CompleteWithColor(-1)
+	if !node.endTime.IsZero() {
+		return
+	}
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.endTime = time.Now()
+	node.done.Done()
 }
-func (node *EchelonNode) CompleteWithColor(ansiColor int) {
+
+func (node *EchelonNode) SetTitleColor(ansiColor int) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.titleColor = ansiColor
-	if node.endTime.IsZero() {
-		node.endTime = time.Now()
-		node.done.Done()
-	}
+}
+
+func (node *EchelonNode) SetStatus(text string) {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.status = text
 }
 
 func (node *EchelonNode) WaitCompletion() {

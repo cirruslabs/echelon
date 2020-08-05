@@ -11,34 +11,39 @@ import (
 )
 
 func main() {
-	console.NewConsole(os.Stdout, generateNode(15), false).StartDrawing()
+	config := node.NewDefaultRenderingConfig()
+	console.NewConsole(os.Stdout, generateNode(config, 15), false).StartDrawing()
 }
 
 var jobIdCounter uint64
 
-func generateNode(magicConstant int) *node.EchelonNode {
+func generateNode(config *node.EchelonNodeRenderingConfig, magicConstant int) *node.EchelonNode {
 	jobId := atomic.AddUint64(&jobIdCounter, 1)
-	result := node.StartNewEchelonNode(fmt.Sprintf("Job %d", jobId))
+	result := node.StartNewEchelonNode(fmt.Sprintf("Job %d", jobId), config)
 	go func() {
 		for step := 0; step < magicConstant; step++ {
 			if rand.Intn(100) < magicConstant {
-				child := generateNode(magicConstant - 1)
+				child := generateNode(config, magicConstant-1)
 				result.AddNewChild(child)
 				child.WaitCompletion()
 			} else {
 				childJobId := atomic.AddUint64(&jobIdCounter, 1)
-				child := node.StartNewEchelonNode(fmt.Sprintf("Job %d", childJobId))
-				result.AddNewChild(child)
+				child := result.StartNewChild(fmt.Sprintf("Job %d", childJobId))
 				subJobDuration := rand.Intn(magicConstant)
 				for waitSecond := 0; waitSecond < subJobDuration; waitSecond++ {
 					time.Sleep(time.Second)
 					child.AppendDescription(fmt.Sprintf("Doing very important jobs! Completed %d/100...", 100*(waitSecond+1)/subJobDuration))
 				}
 				child.ClearDescription()
-				child.CompleteWithColor(node.GREEN_COLOR)
+				child.SetTitleColor(node.GREEN_COLOR)
+				child.SetStatus("👍")
+				child.Complete()
 			}
 		}
-		result.CompleteWithColor(node.GREEN_COLOR)
+		result.ClearAllChildren()
+		result.SetTitleColor(node.GREEN_COLOR)
+		result.SetStatus("👍")
+		result.Complete()
 	}()
 	return result
 }
