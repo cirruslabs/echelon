@@ -45,7 +45,7 @@ func StartNewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
 func NewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
 	zeroTime := time.Time{}
 	result := &EchelonNode{
-		status:                  "",
+		status:                  "⏸",
 		title:                   title,
 		titleColor:              -1,
 		description:             make([]string, 0),
