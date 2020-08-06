@@ -32,7 +32,7 @@ func generateNode(config *node.EchelonNodeRenderingConfig, magicConstant int) *n
 				subJobDuration := rand.Intn(magicConstant)
 				for waitSecond := 0; waitSecond < subJobDuration; waitSecond++ {
 					time.Sleep(time.Second)
-					child.AppendDescription(fmt.Sprintf("Doing very important jobs! Completed %d/100...", 100*(waitSecond+1)/subJobDuration))
+					child.Infof("Doing very important jobs! Completed %d/100...", 100*(waitSecond+1)/subJobDuration)
 				}
 				child.ClearDescription()
 				child.SetTitleColor(node.GREEN_COLOR)

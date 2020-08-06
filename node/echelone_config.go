@@ -4,14 +4,25 @@ import (
 	"time"
 )
 
+type LogLevel uint32
+
+const (
+	ErrorLevel LogLevel = iota
+	WarnLevel
+	InfoLevel
+	DebugLevel
+	TraceLevel
+)
+
 type EchelonNodeRenderingConfig struct {
+	Level                          LogLevel
 	ProgressIndicatorFrames        []string
 	ProgressIndicatorCycleDuration time.Duration
-	MaxDescriptionLines            int
 }
 
 func NewDefaultRenderingConfig() *EchelonNodeRenderingConfig {
 	return &EchelonNodeRenderingConfig{
+		Level: InfoLevel,
 		ProgressIndicatorFrames: []string{
 			"🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
 		},

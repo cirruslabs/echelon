@@ -81,31 +81,16 @@ func (node *EchelonNode) SetDescription(description []string) {
 	node.description = description
 }
 
-func (node *EchelonNode) AppendDescription(line string) {
-	node.AppendDescriptionLines([]string{line})
-}
-
-func (node *EchelonNode) AppendDescriptionLines(lines []string) {
+func (node *EchelonNode) SetVisibleDescriptionLines(count int) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
-	node.description = append(node.description, lines...)
+	node.visibleDescriptionLines = count
 }
 
-func (node *EchelonNode) AppendDescriptionBytes(bytes []byte) {
-	node.lock.Lock()
-	defer node.lock.Unlock()
-	linesToAppend := strings.Split(string(bytes), "\n")
-	if len(linesToAppend) == 0 {
-		return
-	}
-	if len(node.description) == 0 {
-		node.description = linesToAppend
-		return
-	}
-	node.description[len(node.description)-1] = node.description[len(node.description)-1] + linesToAppend[0]
-	if len(linesToAppend) > 1 {
-		node.description = append(node.description, linesToAppend[1:]...)
-	}
+func (node *EchelonNode) DescriptionLength() int {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	return len(node.description)
 }
 
 func (node *EchelonNode) Render() []string {
@@ -113,6 +98,9 @@ func (node *EchelonNode) Render() []string {
 	defer node.lock.RUnlock()
 	result := []string{node.fancyTitle()}
 	tail := node.description
+	if len(node.description) > node.visibleDescriptionLines {
+		tail = append([]string{"..."}, node.description[(len(node.description)-node.visibleDescriptionLines):]...)
+	}
 	if len(node.children) > 0 {
 		tail = node.RenderChildren()
 	}
@@ -256,4 +244,53 @@ func getColorSequence(code int) string {
 		return resetSequence
 	}
 	return fmt.Sprintf("\033[3%dm", code)
+}
+
+func (node *EchelonNode) Tracef(format string, args ...interface{}) {
+	node.Logf(TraceLevel, format, args...)
+}
+
+func (node *EchelonNode) Debugf(format string, args ...interface{}) {
+	node.Logf(DebugLevel, format, args...)
+}
+
+func (node *EchelonNode) Infof(format string, args ...interface{}) {
+	node.Logf(InfoLevel, format, args...)
+}
+
+func (node *EchelonNode) Warnf(format string, args ...interface{}) {
+	node.Logf(WarnLevel, format, args...)
+}
+
+func (node *EchelonNode) Errorf(format string, args ...interface{}) {
+	node.Logf(ErrorLevel, format, args...)
+}
+
+func (node *EchelonNode) IsLevelEnabled(level LogLevel) bool {
+	return node.config.Level >= level
+}
+
+func (node *EchelonNode) Logf(level LogLevel, format string, args ...interface{}) {
+	node.AppendDescription(level, fmt.Sprintf(format, args)+"\n")
+}
+
+func (node *EchelonNode) AppendDescription(level LogLevel, text string) {
+	if !node.IsLevelEnabled(level) {
+		return
+	}
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	linesToAppend := strings.Split(text, "\n")
+	if len(linesToAppend) == 0 {
+		return
+	}
+	if len(node.description) == 0 {
+		node.description = linesToAppend
+		return
+	}
+	// append first new line to the last one
+	node.description[len(node.description)-1] = node.description[len(node.description)-1] + linesToAppend[0]
+	if len(linesToAppend) > 1 {
+		node.description = append(node.description, linesToAppend[1:]...)
+	}
 }
