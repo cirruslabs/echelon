@@ -130,7 +130,10 @@ func (node *EchelonNode) fancyTitle() string {
 	if node.IsRunning() {
 		prefix = node.config.CurrentProgressIndicatorFrame()
 	}
-	coloredTitle := fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
+	coloredTitle := node.title
+	if node.titleColor >= 0 {
+		coloredTitle = fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
+	}
 	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, formatDuration(node.ExecutionDuration()))
 }
 
