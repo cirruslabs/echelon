@@ -14,14 +14,14 @@ const (
 	TraceLevel
 )
 
-type EchelonNodeRenderingConfig struct {
+type EchelonNodeConfig struct {
 	Level                          LogLevel
 	ProgressIndicatorFrames        []string
 	ProgressIndicatorCycleDuration time.Duration
 }
 
-func NewDefaultRenderingConfig() *EchelonNodeRenderingConfig {
-	return &EchelonNodeRenderingConfig{
+func NewDefaultRenderingConfig() *EchelonNodeConfig {
+	return &EchelonNodeConfig{
 		Level: InfoLevel,
 		ProgressIndicatorFrames: []string{
 			"🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
@@ -30,7 +30,7 @@ func NewDefaultRenderingConfig() *EchelonNodeRenderingConfig {
 	}
 }
 
-func (config *EchelonNodeRenderingConfig) CurrentProgressIndicatorFrame() string {
+func (config *EchelonNodeConfig) CurrentProgressIndicatorFrame() string {
 	amountOfFrames := int64(len(config.ProgressIndicatorFrames))
 	nanosPerFrame := int64(config.ProgressIndicatorCycleDuration) / amountOfFrames
 	currentNanosTail := time.Now().UnixNano() % int64(config.ProgressIndicatorCycleDuration)

@@ -17,7 +17,7 @@ func main() {
 
 var jobIdCounter uint64
 
-func generateNode(config *node.EchelonNodeRenderingConfig, magicConstant int) *node.EchelonNode {
+func generateNode(config *node.EchelonNodeConfig, magicConstant int) *node.EchelonNode {
 	jobId := atomic.AddUint64(&jobIdCounter, 1)
 	result := node.StartNewEchelonNode(fmt.Sprintf("Job %d", jobId), config)
 	go func() {

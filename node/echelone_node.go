@@ -30,19 +30,19 @@ type EchelonNode struct {
 	titleColor              int
 	description             []string
 	visibleDescriptionLines int
-	config                  *EchelonNodeRenderingConfig
+	config                  *EchelonNodeConfig
 	startTime               time.Time
 	endTime                 time.Time
 	children                []*EchelonNode
 }
 
-func StartNewEchelonNode(title string, config *EchelonNodeRenderingConfig) *EchelonNode {
+func StartNewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
 	result := NewEchelonNode(title, config)
 	result.Start()
 	return result
 }
 
-func NewEchelonNode(title string, config *EchelonNodeRenderingConfig) *EchelonNode {
+func NewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
 	zeroTime := time.Time{}
 	result := &EchelonNode{
 		status:                  "",
@@ -63,6 +63,12 @@ func (node *EchelonNode) UpdateTitle(text string) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.title = text
+}
+
+func (node *EchelonNode) UpdateConfig(config *EchelonNodeConfig) {
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.config = config
 }
 
 func (node *EchelonNode) ClearAllChildren() {
