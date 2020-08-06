@@ -273,7 +273,7 @@ func (node *EchelonNode) IsLevelEnabled(level LogLevel) bool {
 }
 
 func (node *EchelonNode) Logf(level LogLevel, format string, args ...interface{}) {
-	node.AppendDescription(level, fmt.Sprintf(format, args)+"\n")
+	node.AppendDescription(level, fmt.Sprintf(format, args...)+"\n")
 }
 
 func (node *EchelonNode) AppendDescription(level LogLevel, text string) {
