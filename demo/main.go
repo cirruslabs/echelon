@@ -12,7 +12,7 @@ import (
 
 func main() {
 	config := node.NewDefaultRenderingConfig()
-	console.NewConsole(os.Stdout, generateNode(config, 15), false).StartDrawing()
+	console.NewConsole(os.Stdout, []*node.EchelonNode{generateNode(config, 10)}).StartDrawing()
 }
 
 var jobIdCounter uint64

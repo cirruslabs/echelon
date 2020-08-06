@@ -10,38 +10,41 @@ import (
 
 type EchelonConsole struct {
 	output            *bufio.Writer
-	root              *node.EchelonNode
+	nodes             []*node.EchelonNode
 	currentFrameLines []string
 	refreshRate       time.Duration
 	renderRoot        bool
 }
 
-func NewConsole(output *os.File, root *node.EchelonNode, renderRoot bool) *EchelonConsole {
+func NewConsole(output *os.File, nodes []*node.EchelonNode) *EchelonConsole {
 	return &EchelonConsole{
 		output:      bufio.NewWriter(output),
-		root:        root,
-		renderRoot:  renderRoot,
+		nodes:       nodes,
 		refreshRate: 200 * time.Millisecond,
 	}
 }
 
 func (console *EchelonConsole) StartDrawing() {
-	for console.root != nil && console.root.IsRunning() {
-		console.renderFrame()
+	for {
+		if console.renderFrame() {
+			break
+		}
 		time.Sleep(console.refreshRate)
 	}
-	console.renderFrame()
 }
 
-func (console *EchelonConsole) renderFrame() {
+func (console *EchelonConsole) renderFrame() bool {
 	var newFrameLines []string
-	if console.renderRoot {
-		newFrameLines = console.root.Render()
-	} else {
-		newFrameLines = console.root.RenderChildren()
+	var allComplted = true
+	for _, n := range console.nodes {
+		newFrameLines = append(newFrameLines, n.Render()...)
+		if !n.HasCompleted() {
+			allComplted = false
+		}
 	}
 	calculateIncrementalUpdate(console.output, console.currentFrameLines, newFrameLines)
 	console.currentFrameLines = newFrameLines
+	return allComplted
 }
 
 func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
