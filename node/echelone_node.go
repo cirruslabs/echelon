@@ -218,6 +218,18 @@ func (node *EchelonNode) Start() {
 	}
 }
 
+func (node *EchelonNode) CompleteWithColor(status string, titleColor int) {
+	if !node.endTime.IsZero() {
+		return
+	}
+	node.lock.Lock()
+	defer node.lock.Unlock()
+	node.endTime = time.Now()
+	node.status = status
+	node.titleColor = titleColor
+	node.done.Done()
+}
+
 func (node *EchelonNode) Complete() {
 	if !node.endTime.IsZero() {
 		return
