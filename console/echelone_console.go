@@ -31,6 +31,8 @@ func (console *EchelonConsole) StartDrawing() {
 		}
 		time.Sleep(console.refreshRate)
 	}
+	// render last one time since nodes can be updated async
+	console.renderFrame()
 }
 
 func (console *EchelonConsole) renderFrame() bool {
