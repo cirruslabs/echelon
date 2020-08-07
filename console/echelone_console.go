@@ -26,27 +26,27 @@ func NewConsole(output *os.File, nodes []*node.EchelonNode) *EchelonConsole {
 
 func (console *EchelonConsole) StartDrawing() {
 	for {
-		if console.renderFrame() {
+		if console.DrawFrame() {
 			break
 		}
 		time.Sleep(console.refreshRate)
 	}
 	// render last one time since nodes can be updated async
-	console.renderFrame()
+	console.DrawFrame()
 }
 
-func (console *EchelonConsole) renderFrame() bool {
+func (console *EchelonConsole) DrawFrame() bool {
 	var newFrameLines []string
-	var allComplted = true
+	var allCompleted = true
 	for _, n := range console.nodes {
 		newFrameLines = append(newFrameLines, n.Render()...)
 		if !n.HasCompleted() {
-			allComplted = false
+			allCompleted = false
 		}
 	}
 	calculateIncrementalUpdate(console.output, console.currentFrameLines, newFrameLines)
 	console.currentFrameLines = newFrameLines
-	return allComplted
+	return allCompleted
 }
 
 func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
