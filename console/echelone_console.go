@@ -5,6 +5,7 @@ import (
 	"github.com/cirruslabs/echelon/node"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type EchelonConsole struct {
 	currentFrameLines []string
 	refreshRate       time.Duration
 	renderRoot        bool
+	drawLock          sync.Mutex
 }
 
 func NewConsole(output *os.File, nodes []*node.EchelonNode) *EchelonConsole {
@@ -36,6 +38,8 @@ func (console *EchelonConsole) StartDrawing() {
 }
 
 func (console *EchelonConsole) DrawFrame() bool {
+	console.drawLock.Lock()
+	defer console.drawLock.Unlock()
 	var newFrameLines []string
 	var allCompleted = true
 	for _, n := range console.nodes {
