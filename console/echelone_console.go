@@ -3,7 +3,7 @@ package console
 import (
 	"bufio"
 	"github.com/cirruslabs/echelon/node"
-	"os"
+	"io"
 	"strings"
 	"sync"
 	"time"
@@ -18,7 +18,7 @@ type EchelonConsole struct {
 	drawLock          sync.Mutex
 }
 
-func NewConsole(output *os.File, nodes []*node.EchelonNode) *EchelonConsole {
+func NewConsole(output io.Writer, nodes []*node.EchelonNode) *EchelonConsole {
 	return &EchelonConsole{
 		output:      bufio.NewWriter(output),
 		nodes:       nodes,
