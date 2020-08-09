@@ -70,13 +70,9 @@ func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 	if linesBeforeCount > linesAfterCount {
 		// there will be less lines so let's clear some
 		output.WriteString(strings.Repeat(moveUp+eraseLine, linesBeforeCount-linesAfterCount))
-		output.WriteString(savePosition)
-		// and move up for the rest
-		output.WriteString(strings.Repeat(moveUp, linesAfterCount))
-	} else {
-		output.WriteString(savePosition)
-		output.WriteString(strings.Repeat(moveUp, linesBeforeCount))
 	}
+	// move up to the first line of the update
+	output.WriteString(strings.Repeat(moveUp, linesBeforeCount))
 	for i := 0; i < linesAfterCount; i++ {
 		if i < linesBeforeCount {
 			// line existed before so let's replace it
@@ -91,7 +87,6 @@ func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 			output.WriteString("\n")
 		}
 	}
-	output.WriteString(restorePosition)
 	output.Flush()
 }
 
