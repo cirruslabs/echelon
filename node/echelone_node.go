@@ -292,7 +292,7 @@ func (node *EchelonNode) Logf(level LogLevel, format string, args ...interface{}
 }
 
 func (node *EchelonNode) AppendDescription(level LogLevel, text string) {
-	if !node.IsLevelEnabled(level) {
+	if !node.IsLevelEnabled(level) || node.HasCompleted() {
 		return
 	}
 	node.lock.Lock()
