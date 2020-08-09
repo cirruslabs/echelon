@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	defaultFrameBufSize = 38400 // 80 by 120 of 4 bytes UTF-8 characters
+)
+
 type EchelonConsole struct {
 	output            *bufio.Writer
 	nodes             []*node.EchelonNode
@@ -20,7 +24,7 @@ type EchelonConsole struct {
 
 func NewConsole(output io.Writer, nodes []*node.EchelonNode) *EchelonConsole {
 	return &EchelonConsole{
-		output:      bufio.NewWriter(output),
+		output:      bufio.NewWriterSize(output, defaultFrameBufSize),
 		nodes:       nodes,
 		refreshRate: 200 * time.Millisecond,
 	}
@@ -48,8 +52,9 @@ func (console *EchelonConsole) DrawFrame() bool {
 			allCompleted = false
 		}
 	}
-	calculateIncrementalUpdate(console.output, console.currentFrameLines, newFrameLines)
+	oldFrame := console.currentFrameLines
 	console.currentFrameLines = newFrameLines
+	calculateIncrementalUpdate(console.output, oldFrame, newFrameLines)
 	return allCompleted
 }
 
