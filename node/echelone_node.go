@@ -226,6 +226,9 @@ func (node *EchelonNode) CompleteWithColor(status string, titleColor int) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.endTime = time.Now()
+	if node.startTime.IsZero() {
+		node.startTime = node.endTime
+	}
 	node.status = status
 	node.titleColor = titleColor
 	node.done.Done()
