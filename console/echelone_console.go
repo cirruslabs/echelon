@@ -78,6 +78,7 @@ func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 	if linesAfterCount < linesMinCount {
 		linesMinCount = linesAfterCount
 	}
+	output.WriteString(moveBeginningOfLine)
 
 	if linesBeforeCount > 0 {
 		// move up to the first line of the frame
