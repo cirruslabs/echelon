@@ -134,11 +134,12 @@ func (node *EchelonNode) fancyTitle() string {
 	if node.titleColor >= 0 {
 		coloredTitle = fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
 	}
-	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, formatDuration(node.ExecutionDuration()))
+	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
+	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, duration)
 }
 
-func formatDuration(duration time.Duration) string {
-	if duration < 10*time.Second {
+func formatDuration(duration time.Duration, showDecimals bool) string {
+	if duration < 10*time.Second && showDecimals {
 		return fmt.Sprintf("%.1fs", float64(duration.Milliseconds())/1000)
 	}
 	if duration < time.Minute {

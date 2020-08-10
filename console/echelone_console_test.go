@@ -22,5 +22,5 @@ func Test_calculateIncrementalUpdate_AddSingleLine(t *testing.T) {
 func Test_calculateIncrementalUpdate_InplaceChange(t *testing.T) {
 	var result bytes.Buffer
 	calculateIncrementalUpdate(bufio.NewWriter(&result), []string{"Foo", "Bar", "Baz"}, []string{"Foo", "Updated Bar", "Baz"})
-	assert.Equal(t, "\u001B[A\u001B[A\u001B[KUpdated Bar\r\u001B[B\u001B[B", result.String())
+	assert.Equal(t, "\u001B[2A\u001B[KUpdated Bar\r\u001B[2B", result.String())
 }

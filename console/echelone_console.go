@@ -2,15 +2,19 @@ package console
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/cirruslabs/echelon/node"
 	"io"
-	"strings"
 	"sync"
 	"time"
 )
 
 const (
-	defaultFrameBufSize = 38400 // 80 by 120 of 4 bytes UTF-8 characters
+	defaultFrameBufSize = 38400    // 80 by 120 of 4 bytes UTF-8 characters
+	eraseLine           = "\x1B[K" // clear entire line
+	eraseCursorDown     = "\x1B[J" // erase whole line
+	resetAutoWrap       = "\u001B[?7l"
+	moveBeginningOfLine = "\r"
 )
 
 type EchelonConsole struct {
@@ -31,14 +35,14 @@ func NewConsole(output io.Writer, nodes []*node.EchelonNode) *EchelonConsole {
 }
 
 func (console *EchelonConsole) StartDrawing() {
+	// don't wrap lines since it breaks incremental redraws
+	console.output.WriteString(resetAutoWrap)
 	for {
 		if console.DrawFrame() {
 			break
 		}
 		time.Sleep(console.refreshRate)
 	}
-	// render last one time since nodes can be updated async
-	console.DrawFrame()
 }
 
 func (console *EchelonConsole) DrawFrame() bool {
@@ -47,50 +51,65 @@ func (console *EchelonConsole) DrawFrame() bool {
 	var newFrameLines []string
 	var allCompleted = true
 	for _, n := range console.nodes {
-		newFrameLines = append(newFrameLines, n.Render()...)
 		if !n.HasCompleted() {
 			allCompleted = false
 		}
+		newFrameLines = append(newFrameLines, n.Render()...)
 	}
 	oldFrame := console.currentFrameLines
-	console.currentFrameLines = newFrameLines
 	calculateIncrementalUpdate(console.output, oldFrame, newFrameLines)
+	console.currentFrameLines = newFrameLines
 	return allCompleted
 }
 
 func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
-	const moveUp = "\u001B[A"
-	const moveDown = "\u001B[B"
-	const moveBeginningOfLine = "\r"
-	const eraseLine = "\u001B[K" // move to the beginning and erase
-	const savePosition = "\u001B[s"
-	const restorePosition = "\u001B[u"
 	commonElements := commonElementsCount(linesBefore, linesAfter)
 	if commonElements > 0 {
-		calculateIncrementalUpdate(output, linesBefore[commonElements:], linesAfter[commonElements:])
+		linesBefore = linesBefore[commonElements:]
+		linesAfter = linesAfter[commonElements:]
+	}
+	if len(linesBefore) == 0 && len(linesAfter) == 0 {
+		// no changes
 		return
 	}
 	linesBeforeCount := len(linesBefore)
 	linesAfterCount := len(linesAfter)
-	if linesBeforeCount > linesAfterCount {
-		// there will be less lines so let's clear some
-		output.WriteString(strings.Repeat(moveUp+eraseLine, linesBeforeCount-linesAfterCount))
+	linesMinCount := linesBeforeCount
+	if linesAfterCount < linesMinCount {
+		linesMinCount = linesAfterCount
 	}
-	// move up to the first line of the update
-	output.WriteString(strings.Repeat(moveUp, linesBeforeCount))
-	for i := 0; i < linesAfterCount; i++ {
-		if i < linesBeforeCount {
-			// line existed before so let's replace it
+
+	if linesBeforeCount > 0 {
+		// move up to the first line of the frame
+		output.WriteString(fmt.Sprintf("\x1B[%dA", linesBeforeCount))
+	}
+	if linesMinCount > 0 {
+		// need to do incremental edits
+		lastEditedIndex := 0
+		for i := 0; i < linesMinCount; i++ {
 			if linesBefore[i] != linesAfter[i] {
+				// line existed before and was different so let's replace it
+				linesSkipped := i - lastEditedIndex
+				if linesSkipped > 0 {
+					// move down
+					output.WriteString(fmt.Sprintf("\x1B[%dB", linesSkipped))
+				}
 				output.WriteString(eraseLine)
 				output.WriteString(linesAfter[i])
 				output.WriteString(moveBeginningOfLine)
+				lastEditedIndex = i
 			}
-			output.WriteString(moveDown)
-		} else {
-			output.WriteString(linesAfter[i])
-			output.WriteString("\n")
 		}
+		// in case last few lines were identical
+		output.WriteString(fmt.Sprintf("\x1B[%dB", linesMinCount-lastEditedIndex))
+	}
+	for i := linesMinCount; i < linesAfterCount; i++ {
+		output.WriteString(linesAfter[i])
+		output.WriteString("\n")
+	}
+	if linesBeforeCount > linesAfterCount {
+		// erase everything down below
+		output.WriteString(eraseCursorDown)
 	}
 	output.Flush()
 }
