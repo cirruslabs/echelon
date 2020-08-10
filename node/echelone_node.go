@@ -175,7 +175,7 @@ func (node *EchelonNode) HasStarted() bool {
 func (node *EchelonNode) HasCompleted() bool {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	return !node.startTime.IsZero() && !node.endTime.IsZero()
+	return !node.endTime.IsZero()
 }
 
 func (node *EchelonNode) IsRunning() bool {
@@ -241,6 +241,9 @@ func (node *EchelonNode) Complete() {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.endTime = time.Now()
+	if node.startTime.IsZero() {
+		node.startTime = node.endTime
+	}
 	node.done.Done()
 }
 
