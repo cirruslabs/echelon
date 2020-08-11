@@ -4,7 +4,7 @@
 
 Library to show tree-like hierarchical progress in VT100 compatible terminals.
 
-Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](https://github/cirruslabs/cirrus-cli):
+Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](https://github.com/cirruslabs/cirrus-cli):
 
 ![Cirrus CLI Demo](images/cirrus-cli-demo.gif)
 
@@ -16,4 +16,4 @@ Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](ht
 
 ## Example
 
-Please check `demo` folder for a simple example or how *echelon* is used in [Cirrus CLI](https://github/cirruslabs/cirrus-cli).
+Please check `demo` folder for a simple example or how *echelon* is used in [Cirrus CLI](https://github.com/cirruslabs/cirrus-cli).
