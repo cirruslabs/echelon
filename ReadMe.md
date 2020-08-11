@@ -16,4 +16,4 @@ Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](ht
 
 ## Example
 
-Please check `demo` folder for a simple example or how *echelon* is used in [Cirrus CLI](https://github/cirruslabs/cirrus-cli):
+Please check `demo` folder for a simple example or how *echelon* is used in [Cirrus CLI](https://github/cirruslabs/cirrus-cli).
