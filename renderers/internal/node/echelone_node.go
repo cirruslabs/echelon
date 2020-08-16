@@ -35,7 +35,7 @@ func NewEchelonNode(title string, config *config.InteractiveRendererConfig) *Ech
 	result := &EchelonNode{
 		status:                  "⏸",
 		title:                   title,
-		titleColor:              -1,
+		titleColor:              config.Colors.NeutralColor,
 		description:             make([]string, 0),
 		visibleDescriptionLines: 5,
 		config:                  config,
@@ -122,6 +122,8 @@ func (node *EchelonNode) renderChildren() []string {
 }
 
 func (node *EchelonNode) fancyTitle() string {
+	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
+
 	node.lock.RLock()
 	defer node.lock.RUnlock()
 	prefix := node.status
@@ -132,7 +134,6 @@ func (node *EchelonNode) fancyTitle() string {
 	if node.titleColor >= 0 {
 		coloredTitle = terminal.GetColoredText(node.titleColor, node.title)
 	}
-	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
 	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, duration)
 }
 
@@ -157,7 +158,7 @@ func formatDuration(duration time.Duration, showDecimals bool) string {
 func (node *EchelonNode) ExecutionDuration() time.Duration {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	if node.IsRunning() {
+	if !node.startTime.IsZero() && node.endTime.IsZero() {
 		return time.Now().Sub(node.startTime)
 	} else {
 		return node.endTime.Sub(node.startTime)
