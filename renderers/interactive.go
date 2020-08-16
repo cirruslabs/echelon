@@ -48,8 +48,10 @@ func (r *InteractiveRenderer) RenderScopeStarted(entry *logger.LogScopeStarted) 
 func (r *InteractiveRenderer) RenderScopeFinished(entry *logger.LogScopeFinished) {
 	n := findScopedNode(entry.GetScopes(), r)
 	if entry.Success() {
-		n.ClearAllChildren()
-		n.ClearDescription()
+		if n != r.rootNode {
+			n.ClearAllChildren()
+			n.ClearDescription()
+		}
 		n.CompleteWithColor("✅", r.config.Colors.SuccessColor)
 	} else {
 		n.CompleteWithColor("❌", r.config.Colors.FailureColor)
