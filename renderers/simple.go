@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"github.com/cirruslabs/echelon/logger"
 	"github.com/cirruslabs/echelon/terminal"
+	"github.com/cirruslabs/echelon/utils"
 	"io"
 	"strings"
+	"time"
 )
 
 type SimpleRenderer struct {
-	out    io.Writer
-	colors *terminal.ColorSchema
+	out        io.Writer
+	colors     *terminal.ColorSchema
+	startTimes map[string]time.Time
 }
 
 func NewSimpleRenderer(out io.Writer, colors *terminal.ColorSchema) *SimpleRenderer {
@@ -18,8 +21,9 @@ func NewSimpleRenderer(out io.Writer, colors *terminal.ColorSchema) *SimpleRende
 		colors = terminal.DefaultColorSchema()
 	}
 	return &SimpleRenderer{
-		out:    out,
-		colors: colors,
+		out:        out,
+		colors:     colors,
+		startTimes: make(map[string]time.Time),
 	}
 }
 
@@ -29,6 +33,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *logger.LogScopeStarted) {
 	if level == 0 {
 		return
 	}
+	r.startTimes[strings.Join(scopes, "/")] = time.Now()
 	lastScope := scopes[level-1]
 	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started '%s'", lastScope))
 	r.renderEntryWithIndention(level-1, message)
@@ -40,13 +45,22 @@ func (r SimpleRenderer) RenderScopeFinished(entry *logger.LogScopeFinished) {
 	if level == 0 {
 		return
 	}
+	now := time.Now()
+	startTime := now
+	if t, ok := r.startTimes[strings.Join(scopes, "/")]; ok {
+		startTime = t
+	}
+	duration := now.Sub(startTime)
+	formatedDuration := utils.FormatDuration(duration, true)
 	lastScope := scopes[level-1]
 	if entry.Success() {
-		message := terminal.GetColoredText(r.colors.SuccessColor, fmt.Sprintf("'%s' succeded!", lastScope))
-		r.renderEntryWithIndention(level, message)
+		message := fmt.Sprintf("'%s' succeded in %s!", lastScope, formatedDuration)
+		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
+		r.renderEntryWithIndention(level, coloredMessage)
 	} else {
-		message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("'%s' has failed!", lastScope))
-		r.renderEntryWithIndention(level, message)
+		message := fmt.Sprintf("'%s' failed in %s!", lastScope, formatedDuration)
+		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
+		r.renderEntryWithIndention(level, coloredMessage)
 	}
 }
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cirruslabs/echelon/renderers/config"
 	"github.com/cirruslabs/echelon/terminal"
-	"math"
+	"github.com/cirruslabs/echelon/utils"
 	"strings"
 	"sync"
 	"time"
@@ -122,7 +122,7 @@ func (node *EchelonNode) renderChildren() []string {
 }
 
 func (node *EchelonNode) fancyTitle() string {
-	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
+	duration := utils.FormatDuration(node.ExecutionDuration(), len(node.children) == 0)
 	isRunning := node.IsRunning()
 
 	node.lock.RLock()
@@ -136,24 +136,6 @@ func (node *EchelonNode) fancyTitle() string {
 		coloredTitle = terminal.GetColoredText(node.titleColor, node.title)
 	}
 	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, duration)
-}
-
-func formatDuration(duration time.Duration, showDecimals bool) string {
-	if duration < 10*time.Second && showDecimals {
-		return fmt.Sprintf("%.1fs", float64(duration.Milliseconds())/1000)
-	}
-	if duration < time.Minute {
-		return fmt.Sprintf("%ds", int(math.Floor(duration.Seconds()))%60)
-	}
-	if duration < time.Hour {
-		return fmt.Sprintf("%02d:%02d", int(math.Floor(duration.Minutes()))%60, int(math.Floor(duration.Seconds()))%60)
-	}
-	return fmt.Sprintf(
-		"%02d:%02d:%02d",
-		int(math.Floor(duration.Hours())),
-		int(math.Floor(duration.Minutes()))%60,
-		int(math.Floor(duration.Seconds()))%60,
-	)
 }
 
 func (node *EchelonNode) ExecutionDuration() time.Duration {
