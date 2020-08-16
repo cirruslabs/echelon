@@ -123,11 +123,12 @@ func (node *EchelonNode) renderChildren() []string {
 
 func (node *EchelonNode) fancyTitle() string {
 	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
+	isRunning := node.IsRunning()
 
 	node.lock.RLock()
 	defer node.lock.RUnlock()
 	prefix := node.status
-	if node.IsRunning() {
+	if isRunning {
 		prefix = node.config.CurrentProgressIndicatorFrame()
 	}
 	coloredTitle := node.title
