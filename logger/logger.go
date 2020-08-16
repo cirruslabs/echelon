@@ -13,12 +13,14 @@ type LogRendered interface {
 }
 
 type Logger struct {
+	level          LogLevel
 	scopes         []string
 	entriesChannel chan *genericLogEntry
 }
 
-func NewLogger(renderer LogRendered) *Logger {
+func NewLogger(level LogLevel, renderer LogRendered) *Logger {
 	logger := &Logger{
+		level:          level,
 		entriesChannel: make(chan *genericLogEntry),
 	}
 	go logger.streamEntries(renderer)
@@ -27,6 +29,7 @@ func NewLogger(renderer LogRendered) *Logger {
 
 func (logger *Logger) Scoped(scope string) *Logger {
 	result := &Logger{
+		level:          logger.level,
 		scopes:         append(logger.scopes, scope),
 		entriesChannel: logger.entriesChannel,
 	}
@@ -72,8 +75,10 @@ func (logger *Logger) Errorf(format string, args ...interface{}) {
 }
 
 func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
-	logger.entriesChannel <- &genericLogEntry{
-		LogEntry: NewLogEntryMessage(logger.scopes, level, format, args...),
+	if logger.IsLogLevelEnabled(level) {
+		logger.entriesChannel <- &genericLogEntry{
+			LogEntry: NewLogEntryMessage(logger.scopes, level, format, args...),
+		}
 	}
 }
 
@@ -81,4 +86,8 @@ func (logger *Logger) Finish(success bool) {
 	logger.entriesChannel <- &genericLogEntry{
 		LogFinished: NewLogScopeFinished(success, logger.scopes...),
 	}
+}
+
+func (logger *Logger) IsLogLevelEnabled(level LogLevel) bool {
+	return level <= logger.level
 }

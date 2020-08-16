@@ -11,11 +11,11 @@ import (
 )
 
 func main() {
-	//renderer := renderers.NewSimpleRenderer(os.Stdout, nil)
-	renderer := renderers.NewInteractiveRenderer(os.Stdout, nil)
-	go renderer.StartDrawing()
-	defer renderer.StopDrawing()
-	log := logger.NewLogger(renderer)
+	renderer := renderers.NewSimpleRenderer(os.Stdout, nil)
+	//renderer := renderers.NewInteractiveRenderer(os.Stdout, nil)
+	//go renderer.StartDrawing()
+	//defer renderer.StopDrawing()
+	log := logger.NewLogger(logger.InfoLevel, renderer)
 	generateNode(log, 10)
 	log.Finish(true)
 }
@@ -39,5 +39,6 @@ func generateNode(log *logger.Logger, magicConstant int) {
 			child.Finish(true)
 		}
 	}
+	scoped.Debugf("Finished after %d iterations", magicConstant)
 	scoped.Finish(true)
 }
