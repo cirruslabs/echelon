@@ -2,24 +2,12 @@ package node
 
 import (
 	"fmt"
+	"github.com/cirruslabs/echelon/renderers/config"
+	"github.com/cirruslabs/echelon/terminal"
 	"math"
 	"strings"
 	"sync"
 	"time"
-)
-
-// Reset ANSI sequence
-const resetSequence = "\033[0m"
-
-const (
-	BLACK_COLOR = iota
-	RED_COLOR
-	GREEN_COLOR
-	YELLOW_COLOR
-	BLUE_COLOR
-	MAGENTA_COLOR
-	CYAN_COLOR
-	WHITE_COLOR
 )
 
 type EchelonNode struct {
@@ -30,19 +18,19 @@ type EchelonNode struct {
 	titleColor              int
 	description             []string
 	visibleDescriptionLines int
-	config                  *EchelonNodeConfig
+	config                  *config.InteractiveRendererConfig
 	startTime               time.Time
 	endTime                 time.Time
 	children                []*EchelonNode
 }
 
-func StartNewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
+func StartNewEchelonNode(title string, config *config.InteractiveRendererConfig) *EchelonNode {
 	result := NewEchelonNode(title, config)
 	result.Start()
 	return result
 }
 
-func NewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
+func NewEchelonNode(title string, config *config.InteractiveRendererConfig) *EchelonNode {
 	zeroTime := time.Time{}
 	result := &EchelonNode{
 		status:                  "⏸",
@@ -59,13 +47,19 @@ func NewEchelonNode(title string, config *EchelonNodeConfig) *EchelonNode {
 	return result
 }
 
+func (node *EchelonNode) GetChildren() []*EchelonNode {
+	node.lock.RLock()
+	defer node.lock.RUnlock()
+	return node.children
+}
+
 func (node *EchelonNode) UpdateTitle(text string) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.title = text
 }
 
-func (node *EchelonNode) UpdateConfig(config *EchelonNodeConfig) {
+func (node *EchelonNode) UpdateConfig(config *config.InteractiveRendererConfig) {
 	node.lock.Lock()
 	defer node.lock.Unlock()
 	node.config = config
@@ -132,7 +126,7 @@ func (node *EchelonNode) fancyTitle() string {
 	}
 	coloredTitle := node.title
 	if node.titleColor >= 0 {
-		coloredTitle = fmt.Sprintf("%s%s%s", getColorSequence(node.titleColor), node.title, resetSequence)
+		coloredTitle = terminal.GetColoredText(node.titleColor, node.title)
 	}
 	duration := formatDuration(node.ExecutionDuration(), len(node.children) == 0)
 	return fmt.Sprintf("%s %s %s", prefix, coloredTitle, duration)
@@ -263,43 +257,8 @@ func (node *EchelonNode) WaitCompletion() {
 	node.done.Wait()
 }
 
-func getColorSequence(code int) string {
-	if code < 0 {
-		return resetSequence
-	}
-	return fmt.Sprintf("\033[3%dm", code)
-}
-
-func (node *EchelonNode) Tracef(format string, args ...interface{}) {
-	node.Logf(TraceLevel, format, args...)
-}
-
-func (node *EchelonNode) Debugf(format string, args ...interface{}) {
-	node.Logf(DebugLevel, format, args...)
-}
-
-func (node *EchelonNode) Infof(format string, args ...interface{}) {
-	node.Logf(InfoLevel, format, args...)
-}
-
-func (node *EchelonNode) Warnf(format string, args ...interface{}) {
-	node.Logf(WarnLevel, format, args...)
-}
-
-func (node *EchelonNode) Errorf(format string, args ...interface{}) {
-	node.Logf(ErrorLevel, format, args...)
-}
-
-func (node *EchelonNode) IsLevelEnabled(level LogLevel) bool {
-	return node.config.Level >= level
-}
-
-func (node *EchelonNode) Logf(level LogLevel, format string, args ...interface{}) {
-	node.AppendDescription(level, fmt.Sprintf(format, args...)+"\n")
-}
-
-func (node *EchelonNode) AppendDescription(level LogLevel, text string) {
-	if !node.IsLevelEnabled(level) || node.HasCompleted() {
+func (node *EchelonNode) AppendDescription(text string) {
+	if node.HasCompleted() {
 		return
 	}
 	node.lock.Lock()

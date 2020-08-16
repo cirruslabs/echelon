@@ -1,28 +1,21 @@
-package node
+package config
 
 import (
+	"github.com/cirruslabs/echelon/terminal"
 	"time"
 )
 
-type LogLevel uint32
-
-const (
-	ErrorLevel LogLevel = iota
-	WarnLevel
-	InfoLevel
-	DebugLevel
-	TraceLevel
-)
-
-type EchelonNodeConfig struct {
-	Level                          LogLevel
+type InteractiveRendererConfig struct {
+	Colors                         *terminal.ColorSchema
+	RefreshRate                    time.Duration
 	ProgressIndicatorFrames        []string
 	ProgressIndicatorCycleDuration time.Duration
 }
 
-func NewDefaultRenderingConfig() *EchelonNodeConfig {
-	return &EchelonNodeConfig{
-		Level: InfoLevel,
+func NewDefaultRenderingConfig() *InteractiveRendererConfig {
+	return &InteractiveRendererConfig{
+		Colors:      terminal.DefaultColorSchema(),
+		RefreshRate: 200 * time.Microsecond,
 		ProgressIndicatorFrames: []string{
 			"🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
 		},
@@ -30,7 +23,7 @@ func NewDefaultRenderingConfig() *EchelonNodeConfig {
 	}
 }
 
-func (config *EchelonNodeConfig) CurrentProgressIndicatorFrame() string {
+func (config *InteractiveRendererConfig) CurrentProgressIndicatorFrame() string {
 	amountOfFrames := int64(len(config.ProgressIndicatorFrames))
 	nanosPerFrame := int64(config.ProgressIndicatorCycleDuration) / amountOfFrames
 	currentNanosTail := time.Now().UnixNano() % int64(config.ProgressIndicatorCycleDuration)

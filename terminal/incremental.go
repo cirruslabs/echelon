@@ -1,68 +1,17 @@
-package console
+package terminal
 
 import (
 	"bufio"
 	"fmt"
-	"github.com/cirruslabs/echelon/node"
-	"io"
-	"sync"
-	"time"
 )
 
 const (
-	defaultFrameBufSize = 38400    // 80 by 120 of 4 bytes UTF-8 characters
 	eraseLine           = "\x1B[K" // clear entire line
 	eraseCursorDown     = "\x1B[J" // erase whole line
-	resetAutoWrap       = "\u001B[?7l"
 	moveBeginningOfLine = "\r"
 )
 
-type EchelonConsole struct {
-	output            *bufio.Writer
-	nodes             []*node.EchelonNode
-	currentFrameLines []string
-	refreshRate       time.Duration
-	renderRoot        bool
-	drawLock          sync.Mutex
-}
-
-func NewConsole(output io.Writer, nodes []*node.EchelonNode) *EchelonConsole {
-	return &EchelonConsole{
-		output:      bufio.NewWriterSize(output, defaultFrameBufSize),
-		nodes:       nodes,
-		refreshRate: 200 * time.Millisecond,
-	}
-}
-
-func (console *EchelonConsole) StartDrawing() {
-	// don't wrap lines since it breaks incremental redraws
-	console.output.WriteString(resetAutoWrap)
-	for {
-		if console.DrawFrame() {
-			break
-		}
-		time.Sleep(console.refreshRate)
-	}
-}
-
-func (console *EchelonConsole) DrawFrame() bool {
-	console.drawLock.Lock()
-	defer console.drawLock.Unlock()
-	var newFrameLines []string
-	var allCompleted = true
-	for _, n := range console.nodes {
-		if !n.HasCompleted() {
-			allCompleted = false
-		}
-		newFrameLines = append(newFrameLines, n.Render()...)
-	}
-	oldFrame := console.currentFrameLines
-	calculateIncrementalUpdate(console.output, oldFrame, newFrameLines)
-	console.currentFrameLines = newFrameLines
-	return allCompleted
-}
-
-func calculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
+func CalculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
 	commonElements := commonElementsCount(linesBefore, linesAfter)
 	if commonElements > 0 {
 		linesBefore = linesBefore[commonElements:]
