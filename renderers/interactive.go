@@ -52,9 +52,11 @@ func (r *InteractiveRenderer) RenderScopeFinished(entry *logger.LogScopeFinished
 			n.ClearAllChildren()
 			n.ClearDescription()
 		}
-		n.CompleteWithColor("✅", r.config.Colors.SuccessColor)
+		// for some reason ✅ eats a space when displayed in terminal after it so let's add an extra space
+		n.CompleteWithColor("✅ ", r.config.Colors.SuccessColor)
 	} else {
-		n.CompleteWithColor("❌", r.config.Colors.FailureColor)
+		// for some reason ❌ eats a space when displayed in terminal after it so let's add an extra space
+		n.CompleteWithColor("❌ ", r.config.Colors.FailureColor)
 	}
 }
 
