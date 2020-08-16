@@ -67,12 +67,12 @@ func (r *InteractiveRenderer) StartDrawing() {
 		r.DrawFrame()
 		time.Sleep(r.config.RefreshRate)
 	}
-	// one last redraw
-	r.DrawFrame()
 }
 
 func (r *InteractiveRenderer) StopDrawing() {
 	r.rootNode.Complete()
+	// one last redraw
+	r.DrawFrame()
 }
 
 func (r *InteractiveRenderer) DrawFrame() {
