@@ -68,7 +68,7 @@ func NewLogEntryMessage(scopes []string, level LogLevel, format string, a ...int
 }
 
 func (entry *LogEntryMessage) GetMessage() string {
-	return fmt.Sprintf(entry.format, entry.arguments)
+	return fmt.Sprintf(entry.format, entry.arguments...)
 }
 
 func (entry *LogEntryMessage) GetScopes() []string {

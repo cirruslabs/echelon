@@ -73,7 +73,7 @@ func (logger *Logger) Errorf(format string, args ...interface{}) {
 
 func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 	logger.entriesChannel <- &genericLogEntry{
-		LogEntry: NewLogEntryMessage(logger.scopes, level, format, args),
+		LogEntry: NewLogEntryMessage(logger.scopes, level, format, args...),
 	}
 }
 
