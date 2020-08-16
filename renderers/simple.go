@@ -2,7 +2,7 @@ package renderers
 
 import (
 	"fmt"
-	"github.com/cirruslabs/echelon/logger"
+	"github.com/cirruslabs/echelon"
 	"github.com/cirruslabs/echelon/terminal"
 	"github.com/cirruslabs/echelon/utils"
 	"io"
@@ -27,7 +27,7 @@ func NewSimpleRenderer(out io.Writer, colors *terminal.ColorSchema) *SimpleRende
 	}
 }
 
-func (r SimpleRenderer) RenderScopeStarted(entry *logger.LogScopeStarted) {
+func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	scopes := entry.GetScopes()
 	level := len(scopes)
 	if level == 0 {
@@ -39,7 +39,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *logger.LogScopeStarted) {
 	r.renderEntryWithIndention(level-1, message)
 }
 
-func (r SimpleRenderer) RenderScopeFinished(entry *logger.LogScopeFinished) {
+func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	scopes := entry.GetScopes()
 	level := len(scopes)
 	if level == 0 {
@@ -64,7 +64,7 @@ func (r SimpleRenderer) RenderScopeFinished(entry *logger.LogScopeFinished) {
 	}
 }
 
-func (r SimpleRenderer) RenderMessage(entry *logger.LogEntryMessage) {
+func (r SimpleRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 	r.renderEntryWithIndention(len(entry.GetScopes()), entry.GetMessage())
 }
 

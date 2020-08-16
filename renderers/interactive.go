@@ -2,7 +2,7 @@ package renderers
 
 import (
 	"bufio"
-	"github.com/cirruslabs/echelon/logger"
+	"github.com/cirruslabs/echelon"
 	"github.com/cirruslabs/echelon/renderers/config"
 	"github.com/cirruslabs/echelon/renderers/internal/node"
 	"github.com/cirruslabs/echelon/terminal"
@@ -41,11 +41,11 @@ func findScopedNode(scopes []string, r *InteractiveRenderer) *node.EchelonNode {
 	return result
 }
 
-func (r *InteractiveRenderer) RenderScopeStarted(entry *logger.LogScopeStarted) {
+func (r *InteractiveRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	findScopedNode(entry.GetScopes(), r).Start()
 }
 
-func (r *InteractiveRenderer) RenderScopeFinished(entry *logger.LogScopeFinished) {
+func (r *InteractiveRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	n := findScopedNode(entry.GetScopes(), r)
 	if entry.Success() {
 		if n != r.rootNode {
@@ -60,7 +60,7 @@ func (r *InteractiveRenderer) RenderScopeFinished(entry *logger.LogScopeFinished
 	}
 }
 
-func (r *InteractiveRenderer) RenderMessage(entry *logger.LogEntryMessage) {
+func (r *InteractiveRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 	findScopedNode(entry.GetScopes(), r).AppendDescription(entry.GetMessage() + "\n")
 }
 

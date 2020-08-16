@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cirruslabs/echelon/logger"
+	"github.com/cirruslabs/echelon"
 	"github.com/cirruslabs/echelon/renderers"
 	"math/rand"
 	"os"
@@ -15,14 +15,14 @@ func main() {
 	renderer := renderers.NewInteractiveRenderer(os.Stdout, nil)
 	go renderer.StartDrawing()
 	defer renderer.StopDrawing()
-	log := logger.NewLogger(logger.InfoLevel, renderer)
+	log := echelon.NewLogger(echelon.InfoLevel, renderer)
 	generateNode(log, 10)
 	log.Finish(true)
 }
 
 var jobIdCounter uint64
 
-func generateNode(log *logger.Logger, magicConstant int) {
+func generateNode(log *echelon.Logger, magicConstant int) {
 	jobId := atomic.AddUint64(&jobIdCounter, 1)
 	scoped := log.Scoped(fmt.Sprintf("Job %d", jobId))
 	for step := 0; step < magicConstant; step++ {
