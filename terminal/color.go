@@ -12,21 +12,21 @@ type ColorSchema struct {
 const ResetSequence = "\033[0m"
 
 const (
-	BLACK_COLOR = iota
-	RED_COLOR
-	GREEN_COLOR
-	YELLOW_COLOR
-	BLUE_COLOR
-	MAGENTA_COLOR
-	CYAN_COLOR
-	WHITE_COLOR
+	BlackColor = iota
+	RedColor
+	GreenColor
+	YellowColor
+	BlueColor
+	MagentaColor
+	CyanColor
+	WhiteColor
 )
 
 func DefaultColorSchema() *ColorSchema {
 	return &ColorSchema{
-		SuccessColor: GREEN_COLOR,
-		FailureColor: RED_COLOR,
-		NeutralColor: YELLOW_COLOR,
+		SuccessColor: GreenColor,
+		FailureColor: RedColor,
+		NeutralColor: YellowColor,
 	}
 }
 
