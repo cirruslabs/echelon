@@ -66,7 +66,7 @@ func (r *InteractiveRenderer) RenderMessage(entry *logger.LogEntryMessage) {
 
 func (r *InteractiveRenderer) StartDrawing() {
 	// don't wrap lines since it breaks incremental redraws
-	r.out.WriteString(resetAutoWrap)
+	_, _ = r.out.WriteString(resetAutoWrap)
 	for !r.rootNode.HasCompleted() {
 		r.DrawFrame()
 		time.Sleep(r.config.RefreshRate)

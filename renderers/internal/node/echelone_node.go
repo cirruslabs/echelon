@@ -142,7 +142,7 @@ func (node *EchelonNode) ExecutionDuration() time.Duration {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
 	if !node.startTime.IsZero() && node.endTime.IsZero() {
-		return time.Now().Sub(node.startTime)
+		return time.Since(node.startTime)
 	} else {
 		return node.endTime.Sub(node.startTime)
 	}

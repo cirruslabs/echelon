@@ -12,3 +12,14 @@ task:
   get_script: go get ./...
   build_script: go build ./...
   test_script: go test ./...
+
+task:
+  container:
+    image: golangci/golangci-lint:latest
+  name: Lint
+  script: golangci-lint run -v --out-format json > golangci.json
+  always:
+    artifacts:
+      path: golangci.json
+      type: text/json
+      format: golangci

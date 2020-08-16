@@ -27,11 +27,11 @@ func CalculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 	if linesAfterCount < linesMinCount {
 		linesMinCount = linesAfterCount
 	}
-	output.WriteString(moveBeginningOfLine)
+	_, _ = output.WriteString(moveBeginningOfLine)
 
 	if linesBeforeCount > 0 {
 		// move up to the first line of the frame
-		output.WriteString(fmt.Sprintf("\x1B[%dA", linesBeforeCount))
+		_, _ = output.WriteString(fmt.Sprintf("\x1B[%dA", linesBeforeCount))
 	}
 	if linesMinCount > 0 {
 		// need to do incremental edits
@@ -42,26 +42,26 @@ func CalculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, line
 				linesSkipped := i - lastEditedIndex
 				if linesSkipped > 0 {
 					// move down
-					output.WriteString(fmt.Sprintf("\x1B[%dB", linesSkipped))
+					_, _ = output.WriteString(fmt.Sprintf("\x1B[%dB", linesSkipped))
 				}
-				output.WriteString(eraseLine)
-				output.WriteString(linesAfter[i])
-				output.WriteString(moveBeginningOfLine)
+				_, _ = output.WriteString(eraseLine)
+				_, _ = output.WriteString(linesAfter[i])
+				_, _ = output.WriteString(moveBeginningOfLine)
 				lastEditedIndex = i
 			}
 		}
 		// in case last few lines were identical
-		output.WriteString(fmt.Sprintf("\x1B[%dB", linesMinCount-lastEditedIndex))
+		_, _ = output.WriteString(fmt.Sprintf("\x1B[%dB", linesMinCount-lastEditedIndex))
 	}
 	for i := linesMinCount; i < linesAfterCount; i++ {
-		output.WriteString(linesAfter[i])
-		output.WriteString("\n")
+		_, _ = output.WriteString(linesAfter[i])
+		_, _ = output.WriteString("\n")
 	}
 	if linesBeforeCount > linesAfterCount {
 		// erase everything down below
-		output.WriteString(eraseCursorDown)
+		_, _ = output.WriteString(eraseCursorDown)
 	}
-	output.Flush()
+	_ = output.Flush()
 }
 
 func commonElementsCount(one []string, two []string) int {
