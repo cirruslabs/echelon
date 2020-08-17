@@ -11,8 +11,10 @@ Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](ht
 ## Features
 
 * Customizable and works with any VT100 compatible terminal
+* Has a simplified output for dump terminals
 * Implements incremental drawing algorithm to optimize drawing performance
 * Can be used from multiple go routines
+* Pluggable and configurable renderers  
 
 ## Example
 
