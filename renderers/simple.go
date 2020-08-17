@@ -33,7 +33,12 @@ func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	if level == 0 {
 		return
 	}
-	r.startTimes[strings.Join(scopes, "/")] = time.Now()
+	timeKey := strings.Join(scopes, "/")
+	if _, ok := r.startTimes[timeKey]; ok {
+		// duplicate event
+		return
+	}
+	r.startTimes[timeKey] = time.Now()
 	lastScope := scopes[level-1]
 	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started '%s'", lastScope))
 	r.renderEntry(message)
