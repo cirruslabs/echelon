@@ -10,6 +10,8 @@ type InteractiveRendererConfig struct {
 	RefreshRate                    time.Duration
 	ProgressIndicatorFrames        []string
 	ProgressIndicatorCycleDuration time.Duration
+	SuccessStatus                  string
+	FailureStatus                  string
 }
 
 func NewDefaultRenderingConfig() *InteractiveRendererConfig {
@@ -20,6 +22,8 @@ func NewDefaultRenderingConfig() *InteractiveRendererConfig {
 			"🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
 		},
 		ProgressIndicatorCycleDuration: time.Second,
+		SuccessStatus:                  "✅",
+		FailureStatus:                  "❌",
 	}
 }
 
