@@ -36,7 +36,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	r.startTimes[strings.Join(scopes, "/")] = time.Now()
 	lastScope := scopes[level-1]
 	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started '%s'", lastScope))
-	r.renderEntryWithIndention(level-1, message)
+	r.renderEntry(message)
 }
 
 func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
@@ -56,23 +56,18 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	if entry.Success() {
 		message := fmt.Sprintf("'%s' succeded in %s!", lastScope, formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
-		r.renderEntryWithIndention(level, coloredMessage)
+		r.renderEntry(coloredMessage)
 	} else {
 		message := fmt.Sprintf("'%s' failed in %s!", lastScope, formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
-		r.renderEntryWithIndention(level, coloredMessage)
+		r.renderEntry(coloredMessage)
 	}
 }
 
 func (r SimpleRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
-	r.renderEntryWithIndention(len(entry.GetScopes()), entry.GetMessage())
+	r.renderEntry(entry.GetMessage())
 }
 
-func (r SimpleRenderer) renderEntryWithIndention(level int, message string) {
-	if level <= 0 {
-		_, _ = r.out.Write([]byte(message + "\n"))
-	} else {
-		prefix := strings.Repeat("  ", level)
-		_, _ = r.out.Write(append([]byte(prefix), []byte(message+"\n")...))
-	}
+func (r SimpleRenderer) renderEntry(message string) {
+	_, _ = r.out.Write([]byte(message + "\n"))
 }
