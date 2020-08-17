@@ -54,6 +54,7 @@ func (r *InteractiveRenderer) RenderScopeFinished(entry *echelon.LogScopeFinishe
 		}
 		n.CompleteWithColor(r.config.SuccessStatus, r.config.Colors.SuccessColor)
 	} else {
+		n.SetVisibleDescriptionLines(r.config.DescriptionLinesWhenFailed)
 		n.CompleteWithColor(r.config.FailureStatus, r.config.Colors.FailureColor)
 	}
 }

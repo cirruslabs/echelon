@@ -98,7 +98,7 @@ func (node *EchelonNode) Render() []string {
 	tail := node.renderChildren()
 	node.lock.RLock()
 	defer node.lock.RUnlock()
-	if len(node.description) > node.visibleDescriptionLines {
+	if len(node.description) > node.visibleDescriptionLines && node.visibleDescriptionLines >= 0 {
 		tail = append(tail, "...")
 		tail = append(tail, node.description[(len(node.description)-node.visibleDescriptionLines):]...)
 	} else {

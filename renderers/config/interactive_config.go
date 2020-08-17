@@ -12,6 +12,7 @@ type InteractiveRendererConfig struct {
 	ProgressIndicatorCycleDuration time.Duration
 	SuccessStatus                  string
 	FailureStatus                  string
+	DescriptionLinesWhenFailed     int
 }
 
 func NewDefaultRenderingConfig() *InteractiveRendererConfig {
@@ -24,6 +25,7 @@ func NewDefaultRenderingConfig() *InteractiveRendererConfig {
 		ProgressIndicatorCycleDuration: time.Second,
 		SuccessStatus:                  "✅",
 		FailureStatus:                  "❌",
+		DescriptionLinesWhenFailed:     100,
 	}
 }
 
