@@ -5,6 +5,7 @@ import (
 	"github.com/cirruslabs/echelon/renderers/config"
 	"github.com/cirruslabs/echelon/terminal"
 	"github.com/cirruslabs/echelon/utils"
+	"golang.org/x/text/width"
 	"strings"
 	"sync"
 	"time"
@@ -94,7 +95,7 @@ func (node *EchelonNode) DescriptionLength() int {
 }
 
 func (node *EchelonNode) Render() []string {
-	result := []string{node.fancyTitle()}
+	title := node.fancyTitle()
 	tail := node.renderChildren()
 	node.lock.RLock()
 	defer node.lock.RUnlock()
@@ -104,8 +105,14 @@ func (node *EchelonNode) Render() []string {
 	} else {
 		tail = append(tail, node.description...)
 	}
+	indent := "  " // two spaces by default
+	props, _ := width.LookupString(title)
+	if props.Kind() == width.EastAsianWide || props.Kind() == width.EastAsianFullwidth {
+		indent = "   " // three spaces since title start with a wide emoji
+	}
+	result := []string{title}
 	for _, descriptionLine := range tail {
-		result = append(result, "  "+descriptionLine)
+		result = append(result, indent+descriptionLine)
 	}
 
 	return result
