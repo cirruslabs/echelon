@@ -1,8 +1,8 @@
-# Echelon - hierarchical progress in terminal on steroids
+# Echelon - hierarchical logs in terminal on steroids
 
 [![Build Status](https://api.cirrus-ci.com/github/cirruslabs/echelon.svg)](https://cirrus-ci.com/github/cirruslabs/echelon)
 
-Library to show tree-like hierarchical progress in VT100 compatible terminals.
+Library to organize logs in a hierarchical structure.
 
 Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](https://github.com/cirruslabs/cirrus-cli):
 
@@ -11,10 +11,10 @@ Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](ht
 ## Features
 
 * Customizable and works with any VT100 compatible terminal
-* Has a simplified output for dump terminals
+* Supports simplified output for dump terminals
 * Implements incremental drawing algorithm to optimize drawing performance
-* Can be used from multiple go routines
-* Pluggable and configurable renderers  
+* Can be used from multiple goroutines
+* Pluggable and customizable renderers  
 
 ## Example
 
