@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/cirruslabs/echelon"
 	"github.com/cirruslabs/echelon/renderers/config"
+	"github.com/cirruslabs/echelon/renderers/internal/console"
 	"github.com/cirruslabs/echelon/renderers/internal/node"
 	"github.com/cirruslabs/echelon/terminal"
 	"io"
@@ -64,6 +65,7 @@ func (r *InteractiveRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 }
 
 func (r *InteractiveRenderer) StartDrawing() {
+	_ = console.PrepareTerminalEnvironment()
 	// don't wrap lines since it breaks incremental redraws
 	_, _ = r.out.WriteString(resetAutoWrap)
 	for !r.rootNode.HasCompleted() {

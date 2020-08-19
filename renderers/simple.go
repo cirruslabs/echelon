@@ -3,6 +3,7 @@ package renderers
 import (
 	"fmt"
 	"github.com/cirruslabs/echelon"
+	"github.com/cirruslabs/echelon/renderers/internal/console"
 	"github.com/cirruslabs/echelon/terminal"
 	"github.com/cirruslabs/echelon/utils"
 	"io"
@@ -20,6 +21,7 @@ func NewSimpleRenderer(out io.Writer, colors *terminal.ColorSchema) *SimpleRende
 	if colors == nil {
 		colors = terminal.DefaultColorSchema()
 	}
+	_ = console.PrepareTerminalEnvironment()
 	return &SimpleRenderer{
 		out:        out,
 		colors:     colors,

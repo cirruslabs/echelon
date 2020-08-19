@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/cirruslabs/echelon/terminal"
+	"runtime"
 	"time"
 )
 
@@ -16,6 +17,13 @@ type InteractiveRendererConfig struct {
 }
 
 func NewDefaultRenderingConfig() *InteractiveRendererConfig {
+	if runtime.GOOS == "windows" {
+		return NewDefaultWindowsRenderingConfig()
+	}
+	return NewDefaultUnixRenderingConfig()
+}
+
+func NewDefaultUnixRenderingConfig() *InteractiveRendererConfig {
 	return &InteractiveRendererConfig{
 		Colors:      terminal.DefaultColorSchema(),
 		RefreshRate: 200 * time.Microsecond,
@@ -25,6 +33,20 @@ func NewDefaultRenderingConfig() *InteractiveRendererConfig {
 		ProgressIndicatorCycleDuration: time.Second,
 		SuccessStatus:                  "✅",
 		FailureStatus:                  "❌",
+		DescriptionLinesWhenFailed:     100,
+	}
+}
+
+func NewDefaultWindowsRenderingConfig() *InteractiveRendererConfig {
+	return &InteractiveRendererConfig{
+		Colors:      terminal.DefaultColorSchema(),
+		RefreshRate: 250 * time.Microsecond,
+		ProgressIndicatorFrames: []string{
+			"\\", "|", "/", "-",
+		},
+		ProgressIndicatorCycleDuration: time.Second,
+		SuccessStatus:                  "+",
+		FailureStatus:                  "-",
 		DescriptionLinesWhenFailed:     100,
 	}
 }
