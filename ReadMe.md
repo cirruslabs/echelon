@@ -1,4 +1,4 @@
-# Echelon - hierarchical logs in terminal on steroids
+# Echelon - hierarchical progress in terminals
 
 [![Build Status](https://api.cirrus-ci.com/github/cirruslabs/echelon.svg)](https://cirrus-ci.com/github/cirruslabs/echelon)
 
