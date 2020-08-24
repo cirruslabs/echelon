@@ -19,8 +19,12 @@ func CalculateIncrementalUpdateMaxLines(output *bufio.Writer, linesBefore []stri
 		if linesToIgnore < linesToIgnoreAfter {
 			linesToIgnore = linesToIgnoreAfter
 		}
-		linesBefore = linesBefore[linesToIgnore:]
-		linesAfter = linesAfter[linesToIgnore:]
+		if len(linesBefore) >= linesToIgnore {
+			linesBefore = linesBefore[linesToIgnore:]
+		}
+		if len(linesAfter) >= linesToIgnore {
+			linesAfter = linesAfter[linesToIgnore:]
+		}
 	}
 	CalculateIncrementalUpdate(output, linesBefore, linesAfter)
 }
