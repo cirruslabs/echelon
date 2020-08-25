@@ -11,6 +11,28 @@ const (
 	moveBeginningOfLine = "\r"
 )
 
+func CalculateIncrementalUpdateMaxLines(output *bufio.Writer, linesBefore []string, linesAfter []string, maxLines int) {
+	if len(linesBefore) > maxLines || len(linesAfter) > maxLines {
+		linesToIgnoreBefore := len(linesBefore) - maxLines
+		linesToIgnoreAfter := len(linesAfter) - maxLines
+		linesToIgnore := linesToIgnoreBefore
+		if linesToIgnore < linesToIgnoreAfter {
+			linesToIgnore = linesToIgnoreAfter
+		}
+		if len(linesBefore) >= linesToIgnore {
+			linesBefore = linesBefore[linesToIgnore:]
+		} else {
+			linesBefore = make([]string, 0)
+		}
+		if len(linesAfter) >= linesToIgnore {
+			linesAfter = linesAfter[linesToIgnore:]
+		} else {
+			linesAfter = make([]string, 0)
+		}
+	}
+	CalculateIncrementalUpdate(output, linesBefore, linesAfter)
+}
+
 func CalculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
 	commonElements := commonElementsCount(linesBefore, linesAfter)
 	if commonElements > 0 {

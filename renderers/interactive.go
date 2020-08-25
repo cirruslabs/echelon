@@ -7,7 +7,7 @@ import (
 	"github.com/cirruslabs/echelon/renderers/internal/console"
 	"github.com/cirruslabs/echelon/renderers/internal/node"
 	"github.com/cirruslabs/echelon/terminal"
-	"io"
+	"os"
 	"sync"
 	"time"
 )
@@ -21,16 +21,18 @@ type InteractiveRenderer struct {
 	config            *config.InteractiveRendererConfig
 	currentFrameLines []string
 	drawLock          sync.Mutex
+	terminalHeight    int
 }
 
-func NewInteractiveRenderer(out io.Writer, rendererConfig *config.InteractiveRendererConfig) *InteractiveRenderer {
+func NewInteractiveRenderer(out *os.File, rendererConfig *config.InteractiveRendererConfig) *InteractiveRenderer {
 	if rendererConfig == nil {
 		rendererConfig = config.NewDefaultRenderingConfig()
 	}
 	return &InteractiveRenderer{
-		out:      bufio.NewWriterSize(out, defaultFrameBufSize),
-		rootNode: node.NewEchelonNode("root", rendererConfig),
-		config:   rendererConfig,
+		out:            bufio.NewWriterSize(out, defaultFrameBufSize),
+		rootNode:       node.NewEchelonNode("root", rendererConfig),
+		config:         rendererConfig,
+		terminalHeight: console.TerminalHeight(out),
 	}
 }
 
@@ -87,6 +89,10 @@ func (r *InteractiveRenderer) DrawFrame() {
 	for _, n := range r.rootNode.GetChildren() {
 		newFrameLines = append(newFrameLines, n.Render()...)
 	}
-	terminal.CalculateIncrementalUpdate(r.out, r.currentFrameLines, newFrameLines)
+	if r.terminalHeight > 0 {
+		terminal.CalculateIncrementalUpdateMaxLines(r.out, r.currentFrameLines, newFrameLines, r.terminalHeight)
+	} else {
+		terminal.CalculateIncrementalUpdate(r.out, r.currentFrameLines, newFrameLines)
+	}
 	r.currentFrameLines = newFrameLines
 }

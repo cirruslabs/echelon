@@ -1,6 +1,9 @@
 package console
 
-import "golang.org/x/sys/windows"
+import (
+	"golang.org/x/sys/windows"
+	"os"
+)
 
 func PrepareTerminalEnvironment() error {
 	// enable handling ASCII codes
@@ -19,4 +22,9 @@ func addConsoleMode(handle windows.Handle, flags uint32) error {
 		return err
 	}
 	return windows.SetConsoleMode(handle, mode|flags)
+}
+
+func TerminalHeight(file os.File) int {
+	// todo: figure out how to find out console height on Windows
+	return -1
 }
