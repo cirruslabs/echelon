@@ -61,7 +61,7 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	formatedDuration := utils.FormatDuration(duration, true)
 	lastScope := scopes[level-1]
 	if entry.Success() {
-		message := fmt.Sprintf("'%s' succeded in %s!", lastScope, formatedDuration)
+		message := fmt.Sprintf("'%s' succeeded in %s!", lastScope, formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
 		r.renderEntry(coloredMessage)
 	} else {
