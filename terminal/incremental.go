@@ -19,18 +19,17 @@ func CalculateIncrementalUpdateMaxLines(output *bufio.Writer, linesBefore []stri
 		if linesToIgnore < linesToIgnoreAfter {
 			linesToIgnore = linesToIgnoreAfter
 		}
-		if len(linesBefore) >= linesToIgnore {
-			linesBefore = linesBefore[linesToIgnore:]
-		} else {
-			linesBefore = make([]string, 0)
-		}
-		if len(linesAfter) >= linesToIgnore {
-			linesAfter = linesAfter[linesToIgnore:]
-		} else {
-			linesAfter = make([]string, 0)
-		}
+		linesBefore = removeFirstElements(linesBefore, linesToIgnore)
+		linesAfter = removeFirstElements(linesAfter, linesToIgnore)
 	}
 	CalculateIncrementalUpdate(output, linesBefore, linesAfter)
+}
+
+func removeFirstElements(lines []string, linesToIgnore int) []string {
+	if len(lines) >= linesToIgnore {
+		return lines[linesToIgnore:]
+	}
+	return make([]string, 0)
 }
 
 func CalculateIncrementalUpdate(output *bufio.Writer, linesBefore []string, linesAfter []string) {
