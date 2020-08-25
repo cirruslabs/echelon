@@ -20,17 +20,19 @@ func main() {
 	log.Finish(true)
 }
 
-var jobIdCounter uint64
+//nolint:gochecknoglobals
+var jobIDCounter uint64
 
 func generateNode(log *echelon.Logger, magicConstant int) {
-	jobId := atomic.AddUint64(&jobIdCounter, 1)
-	scoped := log.Scoped(fmt.Sprintf("Job %d", jobId))
+	jobID := atomic.AddUint64(&jobIDCounter, 1)
+	scoped := log.Scoped(fmt.Sprintf("Job %d", jobID))
 	for step := 0; step < magicConstant; step++ {
+		//nolint:gosec,gomnd
 		if rand.Intn(100) < magicConstant {
 			generateNode(log, magicConstant-1)
 		} else {
-			childJobId := atomic.AddUint64(&jobIdCounter, 1)
-			child := scoped.Scoped(fmt.Sprintf("Job %d", childJobId))
+			childJobID := atomic.AddUint64(&jobIDCounter, 1)
+			child := scoped.Scoped(fmt.Sprintf("Job %d", childJobID))
 			subJobDuration := rand.Intn(magicConstant)
 			for waitSecond := 0; waitSecond < subJobDuration; waitSecond++ {
 				time.Sleep(time.Second)

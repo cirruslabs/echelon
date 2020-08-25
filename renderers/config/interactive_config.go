@@ -24,6 +24,7 @@ func NewDefaultRenderingConfig() *InteractiveRendererConfig {
 }
 
 func NewDefaultUnixRenderingConfig() *InteractiveRendererConfig {
+	//nolint:gomnd
 	return &InteractiveRendererConfig{
 		Colors:      terminal.DefaultColorSchema(),
 		RefreshRate: 200 * time.Microsecond,
@@ -38,6 +39,7 @@ func NewDefaultUnixRenderingConfig() *InteractiveRendererConfig {
 }
 
 func NewDefaultWindowsRenderingConfig() *InteractiveRendererConfig {
+	//nolint:gomnd
 	return &InteractiveRendererConfig{
 		Colors:      terminal.DefaultColorSchema(),
 		RefreshRate: 250 * time.Microsecond,

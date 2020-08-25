@@ -1,0 +1,47 @@
+run:
+  timeout: 5m
+
+linters-settings:
+  # Even in Rust you can get away with partial matching,
+  # so make sure that the linter respects the programmer's
+  # intent expressed in the form of "default" case.
+  exhaustive:
+    default-signifies-exhaustive: true
+
+linters:
+  # Selecting all available presets effectively enables all linters.
+  presets:
+    - bugs
+    - complexity
+    - format
+    - performance
+    - style
+    - unused
+
+  disable:
+    # Messages like "struct of size 104 bytes could be of size 96 bytes" from a package
+    # that was last updated 2 years ago[1] are barely helpful.
+    #
+    # After all, we're writing the code for other people, so let's trust the compiler here (that's
+    # constantly evolving compared to this linter) and revisit this if memory usage becomes a problem.
+    #
+    # [1]: https://github.com/mdempsky/maligned/commit/6e39bd26a8c8b58c5a22129593044655a9e25959
+    - maligned
+
+    # We don't have high-performance requirements at this moment, so sacrificing
+    # the code readability for marginal performance gains is not worth it.
+    - prealloc
+
+    # New linters that require a lot of codebase churn and noise, but perhaps we can enable them in the future.
+    - nlreturn
+
+    # Style linters that are total nuts.
+    - wsl
+    - gofumpt
+    - goimports
+    - funlen
+
+issues:
+  # Don't hide multiple issues that belong to one class since GitHub annotations can handle them all nicely.
+  max-issues-per-linter: 0
+  max-same-issues: 0

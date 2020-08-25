@@ -8,7 +8,7 @@ type ColorSchema struct {
 	NeutralColor int
 }
 
-// Reset ANSI sequence
+// Reset ANSI sequence.
 const ResetSequence = "\033[0m"
 
 const (
