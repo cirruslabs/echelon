@@ -1,6 +1,3 @@
-container:
-  image: golang:latest
-
 env:
   GOPROXY: https://proxy.golang.org
 
@@ -12,6 +9,19 @@ task:
   get_script: go get ./...
   build_script: go build ./...
   test_script: go test ./...
+
+task:
+  name: Build (Windows)
+  container:
+    image: golang:latest
+  modules_cache:
+    fingerprint_script: cat go.sum
+    folder: $GOPATH/pkg/mod
+  env:
+    GOOS: windows
+    GOARCH: amd64
+  get_script: go get ./...
+  build_script: go build ./...
 
 task:
   container:

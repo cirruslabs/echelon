@@ -24,7 +24,7 @@ func addConsoleMode(handle windows.Handle, flags uint32) error {
 	return windows.SetConsoleMode(handle, mode|flags)
 }
 
-func TerminalHeight(file os.File) int {
+func TerminalHeight(file *os.File) int {
 	// todo: figure out how to find out console height on Windows
 	return -1
 }
