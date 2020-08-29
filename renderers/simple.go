@@ -78,3 +78,13 @@ func (r SimpleRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 func (r SimpleRenderer) renderEntry(message string) {
 	_, _ = r.out.Write([]byte(message + "\n"))
 }
+
+func (r SimpleRenderer) ScopeHasStarted(scopes []string) bool {
+	level := len(scopes)
+	if level == 0 {
+		return true
+	}
+	timeKey := strings.Join(scopes, "/")
+	_, result := r.startTimes[timeKey]
+	return result
+}
