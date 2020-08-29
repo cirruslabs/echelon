@@ -1,6 +1,9 @@
 env:
   GOPROXY: https://proxy.golang.org
 
+container:
+  image: golang:latest
+
 task:
   name: Test
   modules_cache:
@@ -12,8 +15,6 @@ task:
 
 task:
   name: Build (Windows)
-  container:
-    image: golang:latest
   modules_cache:
     fingerprint_script: cat go.sum
     folder: $GOPATH/pkg/mod
