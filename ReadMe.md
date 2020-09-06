@@ -11,7 +11,7 @@ Here is an example how it looks for running Dockerized tasks via [Cirrus CLI](ht
 ## Features
 
 * Customizable and works with any VT100 compatible terminal
-* Supports simplified output for dump terminals
+* Supports simplified output for dumb terminals
 * Implements incremental drawing algorithm to optimize drawing performance
 * Can be used from multiple goroutines
 * Pluggable and customizable renderers
