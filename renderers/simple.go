@@ -42,7 +42,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	}
 	r.startTimes[timeKey] = time.Now()
 	lastScope := scopes[level-1]
-	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started '%s'", lastScope))
+	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started %s", quotedIfNeeded(lastScope)))
 	r.renderEntry(message)
 }
 
@@ -61,11 +61,11 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	formatedDuration := utils.FormatDuration(duration, true)
 	lastScope := scopes[level-1]
 	if entry.Success() {
-		message := fmt.Sprintf("'%s' succeeded in %s!", lastScope, formatedDuration)
+		message := fmt.Sprintf("%s succeeded in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
 		r.renderEntry(coloredMessage)
 	} else {
-		message := fmt.Sprintf("'%s' failed in %s!", lastScope, formatedDuration)
+		message := fmt.Sprintf("%s failed in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
 		r.renderEntry(coloredMessage)
 	}
@@ -87,4 +87,11 @@ func (r SimpleRenderer) ScopeHasStarted(scopes []string) bool {
 	timeKey := strings.Join(scopes, "/")
 	_, result := r.startTimes[timeKey]
 	return result
+}
+
+func quotedIfNeeded(s string) string {
+	if strings.ContainsAny(s, "'\"") {
+		return s
+	}
+	return "'" + s + "'"
 }
