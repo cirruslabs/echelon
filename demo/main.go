@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	//renderer := renderers.NewSimpleRenderer(os.Stdout, nil)
+	// renderer := renderers.NewSimpleRenderer(os.Stdout, nil)
 	renderer := renderers.NewInteractiveRenderer(os.Stdout, nil)
 	go renderer.StartDrawing()
 	defer renderer.StopDrawing()
