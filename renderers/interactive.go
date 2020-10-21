@@ -12,7 +12,8 @@ import (
 	"time"
 )
 
-const resetAutoWrap = "\u001B[?7l"
+const disableAutoWrap = "\u001B[?7l"
+const enableAutoWrap = "\u001B[?7h"
 const defaultFrameBufSize = 38400 // 80 by 120 of 4 bytes UTF-8 characters
 
 type InteractiveRenderer struct {
@@ -69,7 +70,7 @@ func (r *InteractiveRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 func (r *InteractiveRenderer) StartDrawing() {
 	_ = console.PrepareTerminalEnvironment()
 	// don't wrap lines since it breaks incremental redraws
-	_, _ = r.out.WriteString(resetAutoWrap)
+	_, _ = r.out.WriteString(disableAutoWrap)
 	for !r.rootNode.HasCompleted() {
 		r.DrawFrame()
 		time.Sleep(r.config.RefreshRate)
@@ -80,6 +81,8 @@ func (r *InteractiveRenderer) StopDrawing() {
 	r.rootNode.Complete()
 	// one last redraw
 	r.DrawFrame()
+	// don't leave autowrap disabled in the terminal
+	_, _ = r.out.WriteString(enableAutoWrap)
 }
 
 func (r *InteractiveRenderer) DrawFrame() {
