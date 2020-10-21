@@ -83,6 +83,7 @@ func (r *InteractiveRenderer) StopDrawing() {
 	r.DrawFrame()
 	// don't leave autowrap disabled in the terminal
 	_, _ = r.out.WriteString(enableAutoWrap)
+	_ = r.out.Flush()
 }
 
 func (r *InteractiveRenderer) DrawFrame() {
