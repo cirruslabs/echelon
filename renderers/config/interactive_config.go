@@ -18,12 +18,12 @@ type InteractiveRendererConfig struct {
 
 func NewDefaultRenderingConfig() *InteractiveRendererConfig {
 	if runtime.GOOS == "windows" {
-		return NewDefaultWindowsRenderingConfig()
+		return NewDefaultSymbolsOnlyRenderingConfig()
 	}
-	return NewDefaultUnixRenderingConfig()
+	return NewDefaultEmojiRenderingConfig()
 }
 
-func NewDefaultUnixRenderingConfig() *InteractiveRendererConfig {
+func NewDefaultEmojiRenderingConfig() *InteractiveRendererConfig {
 	//nolint:gomnd
 	return &InteractiveRendererConfig{
 		Colors:      terminal.DefaultColorSchema(),
@@ -38,7 +38,7 @@ func NewDefaultUnixRenderingConfig() *InteractiveRendererConfig {
 	}
 }
 
-func NewDefaultWindowsRenderingConfig() *InteractiveRendererConfig {
+func NewDefaultSymbolsOnlyRenderingConfig() *InteractiveRendererConfig {
 	//nolint:gomnd
 	return &InteractiveRendererConfig{
 		Colors:      terminal.DefaultColorSchema(),
