@@ -19,6 +19,7 @@ linters:
     - unused
 
   disable:
+    - exhaustivestruct
     # Messages like "struct of size 104 bytes could be of size 96 bytes" from a package
     # that was last updated 2 years ago[1] are barely helpful.
     #
