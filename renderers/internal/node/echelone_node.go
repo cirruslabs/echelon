@@ -97,10 +97,10 @@ func (node *EchelonNode) DescriptionLength() int {
 }
 
 func (node *EchelonNode) Render() []string {
-	title := node.fancyTitle()
-	tail := node.renderChildren()
 	node.lock.RLock()
 	defer node.lock.RUnlock()
+	title := node.fancyTitle()
+	tail := node.renderChildren()
 	if len(node.description) > node.visibleDescriptionLines && node.visibleDescriptionLines >= 0 {
 		tail = append(tail, "...")
 		tail = append(tail, node.description[(len(node.description)-node.visibleDescriptionLines):]...)
@@ -121,8 +121,6 @@ func (node *EchelonNode) Render() []string {
 }
 
 func (node *EchelonNode) renderChildren() []string {
-	node.lock.RLock()
-	defer node.lock.RUnlock()
 	var result []string
 	for _, child := range node.children {
 		result = append(result, child.Render()...)
@@ -131,11 +129,8 @@ func (node *EchelonNode) renderChildren() []string {
 }
 
 func (node *EchelonNode) fancyTitle() string {
-	duration := utils.FormatDuration(node.ExecutionDuration(), len(node.children) == 0)
-	isRunning := node.IsRunning()
-
-	node.lock.RLock()
-	defer node.lock.RUnlock()
+	duration := utils.FormatDuration(node.executionDuration(), len(node.children) == 0)
+	isRunning := node.isRunning()
 	prefix := node.status
 	if isRunning {
 		prefix = node.config.CurrentProgressIndicatorFrame()
@@ -150,6 +145,10 @@ func (node *EchelonNode) fancyTitle() string {
 func (node *EchelonNode) ExecutionDuration() time.Duration {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
+	return node.executionDuration()
+}
+
+func (node *EchelonNode) executionDuration() time.Duration {
 	if !node.startTime.IsZero() && node.endTime.IsZero() {
 		return time.Since(node.startTime)
 	}
@@ -171,6 +170,10 @@ func (node *EchelonNode) HasCompleted() bool {
 func (node *EchelonNode) IsRunning() bool {
 	node.lock.RLock()
 	defer node.lock.RUnlock()
+	return node.isRunning()
+}
+
+func (node *EchelonNode) isRunning() bool {
 	return !node.startTime.IsZero() && node.endTime.IsZero()
 }
 
