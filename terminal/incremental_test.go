@@ -9,6 +9,7 @@ import (
 )
 
 func Test_calculateIncrementalUpdate_SameTwoLines(t *testing.T) {
+	t.Parallel()
 	var result bytes.Buffer
 	terminal.CalculateIncrementalUpdate(
 		bufio.NewWriter(&result),
@@ -19,6 +20,7 @@ func Test_calculateIncrementalUpdate_SameTwoLines(t *testing.T) {
 }
 
 func Test_calculateIncrementalUpdate_AddSingleLine(t *testing.T) {
+	t.Parallel()
 	var result bytes.Buffer
 	terminal.CalculateIncrementalUpdate(
 		bufio.NewWriter(&result),
@@ -29,6 +31,7 @@ func Test_calculateIncrementalUpdate_AddSingleLine(t *testing.T) {
 }
 
 func Test_calculateIncrementalUpdate_InplaceChange(t *testing.T) {
+	t.Parallel()
 	var result bytes.Buffer
 	terminal.CalculateIncrementalUpdate(
 		bufio.NewWriter(&result),

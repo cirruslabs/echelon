@@ -7,6 +7,7 @@ import (
 )
 
 func Test_quotedIfNeeded(t *testing.T) {
+	t.Parallel()
 	assert.Equal(t, "'foo'", quotedIfNeeded("foo"))
 
 	assert.Equal(t, "task 'foo'", quotedIfNeeded("task 'foo'"))
