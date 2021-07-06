@@ -60,12 +60,18 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	duration := now.Sub(startTime)
 	formatedDuration := utils.FormatDuration(duration, true)
 	lastScope := scopes[level-1]
-	if entry.Success() {
+
+	switch entry.FinishType() {
+	case echelon.FinishTypeSucceeded:
 		message := fmt.Sprintf("%s succeeded in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
 		r.renderEntry(coloredMessage)
-	} else {
+	case echelon.FinishTypeFailed:
 		message := fmt.Sprintf("%s failed in %s!", quotedIfNeeded(lastScope), formatedDuration)
+		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
+		r.renderEntry(coloredMessage)
+	case echelon.FinishTypeSkipped:
+		message := fmt.Sprintf("%s skipped in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
 		r.renderEntry(coloredMessage)
 	}

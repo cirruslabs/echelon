@@ -32,19 +32,19 @@ func (entry *LogScopeStarted) GetScopes() []string {
 }
 
 type LogScopeFinished struct {
-	scopes  []string
-	success bool
+	scopes     []string
+	finishType FinishType
 }
 
-func NewLogScopeFinished(success bool, scopes ...string) *LogScopeFinished {
+func NewLogScopeFinished(finishType FinishType, scopes ...string) *LogScopeFinished {
 	return &LogScopeFinished{
-		scopes:  scopes,
-		success: success,
+		scopes:     scopes,
+		finishType: finishType,
 	}
 }
 
-func (entry *LogScopeFinished) Success() bool {
-	return entry.success
+func (entry *LogScopeFinished) FinishType() FinishType {
+	return entry.finishType
 }
 
 func (entry *LogScopeFinished) GetScopes() []string {
