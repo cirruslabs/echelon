@@ -35,7 +35,7 @@ func NewDefaultEmojiRenderingConfig() *InteractiveRendererConfig {
 		ProgressIndicatorCycleDuration: time.Second,
 		SuccessStatus:                  "✅",
 		FailureStatus:                  "❌",
-		SkippedStatus:                  "⚠️ ",
+		SkippedStatus:                  "⏩",
 		DescriptionLinesWhenFailed:     100,
 	}
 }
