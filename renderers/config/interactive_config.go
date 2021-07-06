@@ -13,6 +13,7 @@ type InteractiveRendererConfig struct {
 	ProgressIndicatorCycleDuration time.Duration
 	SuccessStatus                  string
 	FailureStatus                  string
+	SkippedStatus                  string
 	DescriptionLinesWhenFailed     int
 }
 
@@ -34,6 +35,7 @@ func NewDefaultEmojiRenderingConfig() *InteractiveRendererConfig {
 		ProgressIndicatorCycleDuration: time.Second,
 		SuccessStatus:                  "✅",
 		FailureStatus:                  "❌",
+		SkippedStatus:                  "⚠️ ",
 		DescriptionLinesWhenFailed:     100,
 	}
 }
@@ -49,6 +51,7 @@ func NewDefaultSymbolsOnlyRenderingConfig() *InteractiveRendererConfig {
 		ProgressIndicatorCycleDuration: time.Second,
 		SuccessStatus:                  "+",
 		FailureStatus:                  "-",
+		SkippedStatus:                  "!",
 		DescriptionLinesWhenFailed:     100,
 	}
 }

@@ -51,15 +51,23 @@ func (r *InteractiveRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted)
 
 func (r *InteractiveRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	n := findScopedNode(entry.GetScopes(), r)
-	if entry.Success() {
+
+	switch entry.FinishType() {
+	case echelon.FinishTypeSucceeded:
 		if n != r.rootNode {
 			n.ClearAllChildren()
 			n.ClearDescription()
 		}
 		n.CompleteWithColor(r.config.SuccessStatus, r.config.Colors.SuccessColor)
-	} else {
+	case echelon.FinishTypeFailed:
 		n.SetVisibleDescriptionLines(r.config.DescriptionLinesWhenFailed)
 		n.CompleteWithColor(r.config.FailureStatus, r.config.Colors.FailureColor)
+	case echelon.FinishTypeSkipped:
+		if n != r.rootNode {
+			n.ClearAllChildren()
+			n.ClearDescription()
+		}
+		n.CompleteWithColor(r.config.SkippedStatus, r.config.Colors.NeutralColor)
 	}
 }
 

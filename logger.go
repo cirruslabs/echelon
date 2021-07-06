@@ -18,6 +18,14 @@ type Logger struct {
 	entriesChannel chan *genericLogEntry
 }
 
+type FinishType int
+
+const (
+	FinishTypeSucceeded FinishType = iota
+	FinishTypeFailed
+	FinishTypeSkipped
+)
+
 func NewLogger(level LogLevel, renderer LogRendered) *Logger {
 	logger := &Logger{
 		level:          level,
@@ -83,8 +91,20 @@ func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 }
 
 func (logger *Logger) Finish(success bool) {
+	var finishType FinishType
+
+	if success {
+		finishType = FinishTypeSucceeded
+	} else {
+		finishType = FinishTypeFailed
+	}
+
+	logger.FinishWithType(finishType)
+}
+
+func (logger *Logger) FinishWithType(finishType FinishType) {
 	logger.entriesChannel <- &genericLogEntry{
-		LogFinished: NewLogScopeFinished(success, logger.scopes...),
+		LogFinished: NewLogScopeFinished(finishType, logger.scopes...),
 	}
 }
 
