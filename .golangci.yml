@@ -35,7 +35,6 @@ linters:
   - gosec
   - gosimple
   - govet
-  - ifshort
   - ineffassign
   - interfacer
   - lll
@@ -119,6 +118,11 @@ linters:
 
     # Unfortunately too much false-positives, e.g. for a 0700 umask or number 10 when using strconv.FormatInt()
     - gomnd
+
+    # Pretty useless linter: there are clearly cases where declaring a variable makes the code more readable,
+    # yet the only way to weed these cases out is to decrease the "max-decl-chars" option from 30 to some other
+    # arbitrary value, which makes little sense.
+    - ifshort
 
 issues:
   # Don't hide multiple issues that belong to one class since GitHub annotations can handle them all nicely.
