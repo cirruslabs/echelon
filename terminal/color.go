@@ -11,6 +11,8 @@ type ColorSchema struct {
 // Reset ANSI sequence.
 const ResetSequence = "\033[0m"
 
+const NoColor = -1
+
 const (
 	BlackColor = iota
 	RedColor
@@ -30,7 +32,19 @@ func DefaultColorSchema() *ColorSchema {
 	}
 }
 
+func NoColorSchema() *ColorSchema {
+	return &ColorSchema{
+		SuccessColor: NoColor,
+		FailureColor: NoColor,
+		NeutralColor: NoColor,
+	}
+}
+
 func GetColoredText(color int, text string) string {
+	if color == NoColor {
+		return text
+	}
+
 	return fmt.Sprintf("%s%s%s", GetColorSequence(color), text, ResetSequence)
 }
 
