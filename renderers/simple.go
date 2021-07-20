@@ -2,13 +2,14 @@ package renderers
 
 import (
 	"fmt"
+	"io"
+	"strings"
+	"time"
+
 	"github.com/cirruslabs/echelon"
 	"github.com/cirruslabs/echelon/renderers/internal/console"
 	"github.com/cirruslabs/echelon/terminal"
 	"github.com/cirruslabs/echelon/utils"
-	"io"
-	"strings"
-	"time"
 )
 
 type SimpleRenderer struct {
@@ -68,7 +69,7 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 		r.renderEntry(coloredMessage)
 	case echelon.FinishTypeFailed:
 		message := fmt.Sprintf("%s failed in %s!", quotedIfNeeded(lastScope), formatedDuration)
-		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
+		coloredMessage := terminal.GetColoredText(r.colors.FailureColor, message)
 		r.renderEntry(coloredMessage)
 	case echelon.FinishTypeSkipped:
 		message := fmt.Sprintf("%s skipped in %s!", quotedIfNeeded(lastScope), formatedDuration)
