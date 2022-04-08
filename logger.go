@@ -4,12 +4,14 @@ type genericLogEntry struct {
 	LogStarted  *LogScopeStarted
 	LogFinished *LogScopeFinished
 	LogEntry    *LogEntryMessage
+	Annotation  *Annotation
 }
 
 type LogRendered interface {
 	RenderScopeStarted(entry *LogScopeStarted)
 	RenderScopeFinished(entry *LogScopeFinished)
 	RenderMessage(entry *LogEntryMessage)
+	RenderAnnotation(entry *Annotation)
 }
 
 type Logger struct {
@@ -59,6 +61,9 @@ func (logger *Logger) streamEntries(renderer LogRendered) {
 		if entry.LogEntry != nil {
 			renderer.RenderMessage(entry.LogEntry)
 		}
+		if entry.Annotation != nil {
+			renderer.RenderAnnotation(entry.Annotation)
+		}
 	}
 }
 
@@ -87,6 +92,29 @@ func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 		logger.entriesChannel <- &genericLogEntry{
 			LogEntry: NewLogEntryMessage(logger.scopes, level, format, args...),
 		}
+	}
+}
+
+type AnnotationLevel int
+
+const (
+	AnnotationLevelNotice AnnotationLevel = iota
+	AnnotationLevelWarning
+	AnnotationLevelError
+)
+
+type Annotation struct {
+	Level     AnnotationLevel
+	File      string
+	LineStart int64
+	LineEnd   int64
+	Title     string
+	Message   string
+}
+
+func (logger *Logger) Annotation(annotation *Annotation) {
+	logger.entriesChannel <- &genericLogEntry{
+		Annotation: annotation,
 	}
 }
 

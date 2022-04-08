@@ -16,6 +16,8 @@ type SimpleRenderer struct {
 	out        io.Writer
 	colors     *terminal.ColorSchema
 	startTimes map[string]time.Time
+
+	StubRenderer
 }
 
 func NewSimpleRenderer(out io.Writer, colors *terminal.ColorSchema) *SimpleRenderer {
@@ -44,7 +46,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	r.startTimes[timeKey] = time.Now()
 	lastScope := scopes[level-1]
 	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started %s", quotedIfNeeded(lastScope)))
-	r.renderEntry(message)
+	r.RenderRawMessage(message)
 }
 
 func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
@@ -66,23 +68,23 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	case echelon.FinishTypeSucceeded:
 		message := fmt.Sprintf("%s succeeded in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
-		r.renderEntry(coloredMessage)
+		r.RenderRawMessage(coloredMessage)
 	case echelon.FinishTypeFailed:
 		message := fmt.Sprintf("%s failed in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.FailureColor, message)
-		r.renderEntry(coloredMessage)
+		r.RenderRawMessage(coloredMessage)
 	case echelon.FinishTypeSkipped:
 		message := fmt.Sprintf("%s skipped in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
-		r.renderEntry(coloredMessage)
+		r.RenderRawMessage(coloredMessage)
 	}
 }
 
 func (r SimpleRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
-	r.renderEntry(entry.GetMessage())
+	r.RenderRawMessage(entry.GetMessage())
 }
 
-func (r SimpleRenderer) renderEntry(message string) {
+func (r SimpleRenderer) RenderRawMessage(message string) {
 	_, _ = r.out.Write([]byte(message + "\n"))
 }
 
