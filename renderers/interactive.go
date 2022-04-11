@@ -23,6 +23,8 @@ type InteractiveRenderer struct {
 	currentFrameLines []string
 	drawLock          sync.Mutex
 	terminalHeight    int
+
+	StubRenderer
 }
 
 func NewInteractiveRenderer(out *os.File, rendererConfig *config.InteractiveRendererConfig) *InteractiveRenderer {

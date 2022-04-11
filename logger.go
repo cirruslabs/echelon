@@ -16,6 +16,7 @@ type Logger struct {
 	level          LogLevel
 	scopes         []string
 	entriesChannel chan *genericLogEntry
+	renderer       LogRendered
 }
 
 type FinishType int
@@ -30,9 +31,14 @@ func NewLogger(level LogLevel, renderer LogRendered) *Logger {
 	logger := &Logger{
 		level:          level,
 		entriesChannel: make(chan *genericLogEntry),
+		renderer:       renderer,
 	}
 	go logger.streamEntries(renderer)
 	return logger
+}
+
+func (logger *Logger) Renderer() LogRendered {
+	return logger.renderer
 }
 
 func (logger *Logger) Scoped(scope string) *Logger {
