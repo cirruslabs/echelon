@@ -4,20 +4,19 @@ type genericLogEntry struct {
 	LogStarted  *LogScopeStarted
 	LogFinished *LogScopeFinished
 	LogEntry    *LogEntryMessage
-	Annotation  *Annotation
 }
 
 type LogRendered interface {
 	RenderScopeStarted(entry *LogScopeStarted)
 	RenderScopeFinished(entry *LogScopeFinished)
 	RenderMessage(entry *LogEntryMessage)
-	RenderAnnotation(entry *Annotation)
 }
 
 type Logger struct {
 	level          LogLevel
 	scopes         []string
 	entriesChannel chan *genericLogEntry
+	renderer       LogRendered
 }
 
 type FinishType int
@@ -32,9 +31,14 @@ func NewLogger(level LogLevel, renderer LogRendered) *Logger {
 	logger := &Logger{
 		level:          level,
 		entriesChannel: make(chan *genericLogEntry),
+		renderer:       renderer,
 	}
 	go logger.streamEntries(renderer)
 	return logger
+}
+
+func (logger *Logger) Renderer() LogRendered {
+	return logger.renderer
 }
 
 func (logger *Logger) Scoped(scope string) *Logger {
@@ -60,9 +64,6 @@ func (logger *Logger) streamEntries(renderer LogRendered) {
 		}
 		if entry.LogEntry != nil {
 			renderer.RenderMessage(entry.LogEntry)
-		}
-		if entry.Annotation != nil {
-			renderer.RenderAnnotation(entry.Annotation)
 		}
 	}
 }
@@ -92,29 +93,6 @@ func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 		logger.entriesChannel <- &genericLogEntry{
 			LogEntry: NewLogEntryMessage(logger.scopes, level, format, args...),
 		}
-	}
-}
-
-type AnnotationLevel int
-
-const (
-	AnnotationLevelNotice AnnotationLevel = iota
-	AnnotationLevelWarning
-	AnnotationLevelError
-)
-
-type Annotation struct {
-	Level     AnnotationLevel
-	File      string
-	LineStart int64
-	LineEnd   int64
-	Title     string
-	Message   string
-}
-
-func (logger *Logger) Annotation(annotation *Annotation) {
-	logger.entriesChannel <- &genericLogEntry{
-		Annotation: annotation,
 	}
 }
 
