@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const defaultVisibleLines = 5
+
 type InteractiveRendererConfig struct {
 	Colors                         *terminal.ColorSchema
 	RefreshRate                    time.Duration
@@ -15,6 +17,7 @@ type InteractiveRendererConfig struct {
 	FailureStatus                  string
 	SkippedStatus                  string
 	DescriptionLinesWhenFailed     int
+	VisibleDescriptionLines        int
 }
 
 func NewDefaultRenderingConfig() *InteractiveRendererConfig {
@@ -37,6 +40,7 @@ func NewDefaultEmojiRenderingConfig() *InteractiveRendererConfig {
 		FailureStatus:                  "❌",
 		SkippedStatus:                  "⏩",
 		DescriptionLinesWhenFailed:     100,
+		VisibleDescriptionLines:        defaultVisibleLines,
 	}
 }
 

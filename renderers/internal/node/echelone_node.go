@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-const defaultVisibleLines = 5
-
 type EchelonNode struct {
 	lock                    sync.RWMutex
 	done                    sync.WaitGroup
@@ -40,7 +38,7 @@ func NewEchelonNode(title string, config *config.InteractiveRendererConfig) *Ech
 		title:                   title,
 		titleColor:              config.Colors.NeutralColor,
 		description:             make([]string, 0),
-		visibleDescriptionLines: defaultVisibleLines,
+		visibleDescriptionLines: config.VisibleDescriptionLines,
 		config:                  config,
 		startTime:               zeroTime,
 		endTime:                 zeroTime,
