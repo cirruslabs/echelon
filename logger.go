@@ -85,6 +85,14 @@ func (logger *Logger) Infof(format string, args ...interface{}) {
 	logger.Logf(InfoLevel, format, args...)
 }
 
+func (logger *Logger) Write(p []byte) (n int, err error) {
+	logger.entriesChannel <- &genericLogEntry{
+		RawLogEntry: NewRawLogEntryMessage(logger.scopes, InfoLevel, string(p)),
+	}
+
+	return len(p), err
+}
+
 func (logger *Logger) Warnf(format string, args ...interface{}) {
 	logger.Logf(WarnLevel, format, args...)
 }
