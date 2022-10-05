@@ -4,12 +4,14 @@ type genericLogEntry struct {
 	LogStarted  *LogScopeStarted
 	LogFinished *LogScopeFinished
 	LogEntry    *LogEntryMessage
+	RawLogEntry *RawLogEntryMessage
 }
 
 type LogRendered interface {
 	RenderScopeStarted(entry *LogScopeStarted)
 	RenderScopeFinished(entry *LogScopeFinished)
 	RenderMessage(entry *LogEntryMessage)
+	RenderRawMessage(entry *RawLogEntryMessage)
 }
 
 type Logger struct {
@@ -64,6 +66,9 @@ func (logger *Logger) streamEntries(renderer LogRendered) {
 		}
 		if entry.LogEntry != nil {
 			renderer.RenderMessage(entry.LogEntry)
+		}
+		if entry.RawLogEntry != nil {
+			renderer.RenderRawMessage(entry.RawLogEntry)
 		}
 	}
 }

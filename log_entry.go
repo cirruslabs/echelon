@@ -58,12 +58,34 @@ type LogEntryMessage struct {
 	scopes    []string
 }
 
+type RawLogEntryMessage struct {
+	Level   LogLevel
+	message string
+	scopes  []string
+}
+
+func (entry RawLogEntryMessage) GetMessage() string {
+	return fmt.Sprint(entry.message)
+}
+
+func (entry RawLogEntryMessage) GetScopes() []string {
+	return entry.scopes
+}
+
 func NewLogEntryMessage(scopes []string, level LogLevel, format string, a ...interface{}) *LogEntryMessage {
 	return &LogEntryMessage{
 		Level:     level,
 		format:    format,
 		arguments: a,
 		scopes:    scopes,
+	}
+}
+
+func NewRawLogEntryMessage(scopes []string, level LogLevel, message string) *RawLogEntryMessage {
+	return &RawLogEntryMessage{
+		Level:   level,
+		message: message,
+		scopes:  scopes,
 	}
 }
 

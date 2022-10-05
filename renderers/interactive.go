@@ -77,6 +77,10 @@ func (r *InteractiveRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 	findScopedNode(entry.GetScopes(), r).AppendDescription(entry.GetMessage() + "\n")
 }
 
+func (r *InteractiveRenderer) RenderRawMessage(entry *echelon.RawLogEntryMessage) {
+	findScopedNode(entry.GetScopes(), r).AppendDescription(entry.GetMessage())
+}
+
 func (r *InteractiveRenderer) StartDrawing() {
 	_ = console.PrepareTerminalEnvironment()
 	// don't wrap lines since it breaks incremental redraws
