@@ -46,7 +46,7 @@ func (r SimpleRenderer) RenderScopeStarted(entry *echelon.LogScopeStarted) {
 	r.startTimes[timeKey] = time.Now()
 	lastScope := scopes[level-1]
 	message := terminal.GetColoredText(r.colors.NeutralColor, fmt.Sprintf("Started %s", quotedIfNeeded(lastScope)))
-	r.RenderRawMessage(message)
+	r.RenderRawMessage(message + "\n")
 }
 
 func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
@@ -68,15 +68,15 @@ func (r SimpleRenderer) RenderScopeFinished(entry *echelon.LogScopeFinished) {
 	case echelon.FinishTypeSucceeded:
 		message := fmt.Sprintf("%s succeeded in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.SuccessColor, message)
-		r.RenderRawMessage(coloredMessage)
+		r.RenderRawMessage(coloredMessage + "\n")
 	case echelon.FinishTypeFailed:
 		message := fmt.Sprintf("%s failed in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.FailureColor, message)
-		r.RenderRawMessage(coloredMessage)
+		r.RenderRawMessage(coloredMessage + "\n")
 	case echelon.FinishTypeSkipped:
 		message := fmt.Sprintf("%s skipped in %s!", quotedIfNeeded(lastScope), formatedDuration)
 		coloredMessage := terminal.GetColoredText(r.colors.NeutralColor, message)
-		r.RenderRawMessage(coloredMessage)
+		r.RenderRawMessage(coloredMessage + "\n")
 	}
 }
 
