@@ -53,16 +53,16 @@ func (entry *LogScopeFinished) GetScopes() []string {
 
 type LogEntryMessage struct {
 	Level   LogLevel
-	message string
 	scopes  []string
+	message string
 	raw     bool
 }
 
 func NewLogEntryMessage(scopes []string, level LogLevel, format string, arguments ...interface{}) *LogEntryMessage {
 	return &LogEntryMessage{
 		Level:   level,
-		message: fmt.Sprintf(format, arguments...),
 		scopes:  scopes,
+		message: fmt.Sprintf(format, arguments...),
 	}
 }
 
