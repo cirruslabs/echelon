@@ -1,5 +1,7 @@
 package echelon
 
+import "io"
+
 type genericLogEntry struct {
 	LogStarted  *LogScopeStarted
 	LogFinished *LogScopeFinished
@@ -13,10 +15,24 @@ type LogRendered interface {
 }
 
 type Logger struct {
-	level          LogLevel
+	maxLogLevel    LogLevel
 	scopes         []string
 	entriesChannel chan *genericLogEntry
 	renderer       LogRendered
+}
+
+type loggerAsWriter struct {
+	logger *Logger
+	level  LogLevel
+}
+
+func (w *loggerAsWriter) Write(p []byte) (n int, err error) {
+	if w.logger.IsLogLevelEnabled(w.level) {
+		logEntryMessage := NewLogEntryMessage(w.logger.scopes, w.level, string(p))
+		logEntryMessage.raw = true
+		w.logger.entriesChannel <- &genericLogEntry{LogEntry: logEntryMessage}
+	}
+	return len(p), err
 }
 
 type FinishType int
@@ -29,7 +45,7 @@ const (
 
 func NewLogger(level LogLevel, renderer LogRendered) *Logger {
 	logger := &Logger{
-		level:          level,
+		maxLogLevel:    level,
 		entriesChannel: make(chan *genericLogEntry),
 		renderer:       renderer,
 	}
@@ -43,7 +59,7 @@ func (logger *Logger) Renderer() LogRendered {
 
 func (logger *Logger) Scoped(scope string) *Logger {
 	result := &Logger{
-		level:          logger.level,
+		maxLogLevel:    logger.maxLogLevel,
 		scopes:         append(logger.scopes, scope),
 		entriesChannel: logger.entriesChannel,
 	}
@@ -96,6 +112,10 @@ func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 	}
 }
 
+func (logger *Logger) AsWriter(level LogLevel) io.Writer {
+	return &loggerAsWriter{logger: logger, level: level}
+}
+
 func (logger *Logger) Finish(success bool) {
 	var finishType FinishType
 
@@ -115,5 +135,5 @@ func (logger *Logger) FinishWithType(finishType FinishType) {
 }
 
 func (logger *Logger) IsLogLevelEnabled(level LogLevel) bool {
-	return level <= logger.level
+	return level <= logger.maxLogLevel
 }
