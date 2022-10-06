@@ -52,28 +52,25 @@ func (entry *LogScopeFinished) GetScopes() []string {
 }
 
 type LogEntryMessage struct {
-	Level     LogLevel
-	format    string
-	arguments []interface{}
-	scopes    []string
-	raw       bool
+	Level   LogLevel
+	message string
+	scopes  []string
+	raw     bool
 }
 
-func NewLogEntryMessage(scopes []string, level LogLevel, format string, a ...interface{}) *LogEntryMessage {
+func NewLogEntryMessage(scopes []string, level LogLevel, format string, arguments ...interface{}) *LogEntryMessage {
 	return &LogEntryMessage{
-		Level:     level,
-		format:    format,
-		arguments: a,
-		scopes:    scopes,
+		Level:   level,
+		message: fmt.Sprintf(format, arguments...),
+		scopes:  scopes,
 	}
 }
 
 func (entry *LogEntryMessage) GetMessage() string {
-	formattedMessage := fmt.Sprintf(entry.format, entry.arguments...)
 	if entry.raw {
-		return formattedMessage
+		return entry.message
 	}
-	return formattedMessage + "\n"
+	return entry.message + "\n"
 }
 
 func (entry *LogEntryMessage) GetScopes() []string {
