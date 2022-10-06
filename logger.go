@@ -96,6 +96,13 @@ func (logger *Logger) Logf(level LogLevel, format string, args ...interface{}) {
 	}
 }
 
+func (logger *Logger) Write(p []byte) (n int, err error) {
+	logEntryMessage := NewLogEntryMessage(logger.scopes, InfoLevel, string(p))
+	logEntryMessage.raw = true
+	logger.entriesChannel <- &genericLogEntry{LogEntry: logEntryMessage}
+	return len(p), err
+}
+
 func (logger *Logger) Finish(success bool) {
 	var finishType FinishType
 

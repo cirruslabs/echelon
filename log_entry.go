@@ -56,6 +56,7 @@ type LogEntryMessage struct {
 	format    string
 	arguments []interface{}
 	scopes    []string
+	raw       bool
 }
 
 func NewLogEntryMessage(scopes []string, level LogLevel, format string, a ...interface{}) *LogEntryMessage {
@@ -68,7 +69,11 @@ func NewLogEntryMessage(scopes []string, level LogLevel, format string, a ...int
 }
 
 func (entry *LogEntryMessage) GetMessage() string {
-	return fmt.Sprintf(entry.format, entry.arguments...)
+	formattedMessage := fmt.Sprintf(entry.format, entry.arguments...)
+	if entry.raw {
+		return formattedMessage
+	}
+	return formattedMessage + "\n"
 }
 
 func (entry *LogEntryMessage) GetScopes() []string {

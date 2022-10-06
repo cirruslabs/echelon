@@ -85,7 +85,7 @@ func (r SimpleRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
 }
 
 func (r SimpleRenderer) RenderRawMessage(message string) {
-	_, _ = r.out.Write([]byte(message + "\n"))
+	_, _ = r.out.Write([]byte(message))
 }
 
 func (r SimpleRenderer) ScopeHasStarted(scopes []string) bool {

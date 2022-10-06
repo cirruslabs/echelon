@@ -74,7 +74,7 @@ func (r *InteractiveRenderer) RenderScopeFinished(entry *echelon.LogScopeFinishe
 }
 
 func (r *InteractiveRenderer) RenderMessage(entry *echelon.LogEntryMessage) {
-	findScopedNode(entry.GetScopes(), r).AppendDescription(entry.GetMessage() + "\n")
+	findScopedNode(entry.GetScopes(), r).AppendDescription(entry.GetMessage())
 }
 
 func (r *InteractiveRenderer) StartDrawing() {
