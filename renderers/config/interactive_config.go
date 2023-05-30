@@ -17,6 +17,7 @@ type InteractiveRendererConfig struct {
 	FailureStatus                  string
 	SkippedStatus                  string
 	DescriptionLinesWhenFailed     int
+	DescriptionLinesWhenSkipped    int
 	VisibleDescriptionLines        int
 }
 
@@ -40,6 +41,7 @@ func NewDefaultEmojiRenderingConfig() *InteractiveRendererConfig {
 		FailureStatus:                  "❌",
 		SkippedStatus:                  "⏩",
 		DescriptionLinesWhenFailed:     100,
+		DescriptionLinesWhenSkipped:    0,
 		VisibleDescriptionLines:        defaultVisibleLines,
 	}
 }
@@ -57,6 +59,7 @@ func NewDefaultSymbolsOnlyRenderingConfig() *InteractiveRendererConfig {
 		FailureStatus:                  "-",
 		SkippedStatus:                  "!",
 		DescriptionLinesWhenFailed:     100,
+		DescriptionLinesWhenSkipped:    0,
 	}
 }
 

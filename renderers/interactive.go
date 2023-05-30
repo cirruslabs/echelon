@@ -65,7 +65,9 @@ func (r *InteractiveRenderer) RenderScopeFinished(entry *echelon.LogScopeFinishe
 		n.SetVisibleDescriptionLines(r.config.DescriptionLinesWhenFailed)
 		n.CompleteWithColor(r.config.FailureStatus, r.config.Colors.FailureColor)
 	case echelon.FinishTypeSkipped:
-		if n != r.rootNode {
+		if r.config.DescriptionLinesWhenSkipped != 0 {
+			n.SetVisibleDescriptionLines(r.config.DescriptionLinesWhenSkipped)
+		} else if n != r.rootNode {
 			n.ClearAllChildren()
 			n.ClearDescription()
 		}
