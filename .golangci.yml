@@ -9,55 +9,7 @@ linters-settings:
     default-signifies-exhaustive: true
 
 linters:
-  enable:
-  - asciicheck
-  - bodyclose
-  - deadcode
-  - dogsled
-  - dupl
-  - errcheck
-  - exhaustive
-  - exportloopref
-  - gochecknoinits
-  - gocognit
-  - goconst
-  - gocritic
-  - gocyclo
-  - godot
-  - godox
-  - goerr113
-  - gofmt
-  - goheader
-  - golint
-  - gomodguard
-  - goprintffuncname
-  - gosec
-  - gosimple
-  - govet
-  - ineffassign
-  - interfacer
-  - lll
-  - makezero
-  - misspell
-  - nakedret
-  - nestif
-  - noctx
-  - nolintlint
-  - predeclared
-  - rowserrcheck
-  - scopelint
-  - sqlclosecheck
-  - staticcheck
-  - structcheck
-  - stylecheck
-  - testpackage
-  - tparallel
-  - typecheck
-  - unconvert
-  - unparam
-  - unused
-  - varcheck
-  - whitespace
+  enable-all: true
 
   disable:
     # Messages like "struct of size 104 bytes could be of size 96 bytes" from a package
@@ -125,6 +77,15 @@ linters:
 
     # We can handle this ourselves
     - depguard
+
+    # Disabled linters after moving to "enable-all: true"
+    - mnd
+    - exhaustruct
+    - varnamelen
+    - gci
+    - ireturn
+    - nonamedreturns
+    - perfsprint
 
 issues:
   # Don't hide multiple issues that belong to one class since GitHub annotations can handle them all nicely.
