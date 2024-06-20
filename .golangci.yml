@@ -13,7 +13,6 @@ linters:
   - asciicheck
   - bodyclose
   - deadcode
-  - depguard
   - dogsled
   - dupl
   - errcheck
@@ -123,6 +122,9 @@ linters:
     # yet the only way to weed these cases out is to decrease the "max-decl-chars" option from 30 to some other
     # arbitrary value, which makes little sense.
     - ifshort
+
+    # We can handle this ourselves
+    - depguard
 
 issues:
   # Don't hide multiple issues that belong to one class since GitHub annotations can handle them all nicely.
